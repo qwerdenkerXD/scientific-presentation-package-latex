@@ -161,8 +161,11 @@ python3 test/check.py            # compare against thbtalk.sty in HEAD (or: a re
 ```
 
 It compiles the coverage document in four variants with both versions, renders every page and
-compares them pixel by pixel. Exit code 0 means nothing looks different; otherwise the differing
-pages are listed and marked red in `test/build/<variant>/diff-page-NN.png`. Needs `pdflatex`,
+compares them pixel by pixel. It uses the reference's own `coverage.tex`, so the comparison
+covers everything both versions have; if you added a command to `test/coverage.tex`, the new
+version is compiled as well, since a new command has nothing to look like yet but must compile.
+Exit code 0 means nothing looks different and everything compiles; otherwise the problems are
+listed, and differing pages are marked red in `test/build/<variant>/diff-page-NN.png`. Needs `pdflatex`,
 `pdftocairo` (poppler-utils) and Python with Pillow. When you add a command, add it to
 `test/coverage.tex` as well.
 
