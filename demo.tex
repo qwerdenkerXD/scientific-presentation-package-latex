@@ -1,0 +1,160 @@
+% demo.tex -- minimal example talk built on thbtalk.sty
+% Compile with pdfLaTeX (twice, for the section dots and slide count).
+\documentclass[aspectratio=169,10pt]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}      % ngerman for German talks
+\usepackage{thbtalk}             % lang=de switches the built-in labels
+
+\title{Adaptive Sampling for Sparse Sensor Networks}
+\subtitle{A field study on the Upper Rhine}
+\author{A.~Musterfrau}
+\institute{Technische Hochschule Bingen}
+\date{\today}
+\thbvenue{ICSE Workshop, Mainz}
+\thblogotext{TH Bingen}          % or: \thblogo{logo-th-bingen.pdf}
+\thbcontact{a.musterfrau@th-bingen.de \textperiodcentered\ doi.org/10.0000/xyz}
+
+% One line per section, shown under the entry on the outline slide (optional)
+\thboutlinenote{1}{Where static sampling breaks down in the field}
+\thboutlinenote{2}{A variance-driven scheduler with a submodular guarantee}
+\thboutlinenote{3}{Eleven weeks on the Upper Rhine, 18 nodes}
+
+\begin{document}
+
+\thbtitleframe
+\thboutline
+
+\section{Motivation}
+
+\begin{frame}{Why sparse networks fail}{Three observations from two deployments}
+  \begin{itemize}
+    \item Node dropout is bursty, not uniform.
+    \item Static sampling wastes 40\,\% of the energy budget.
+    \item Reconstruction error grows superlinearly below 12 active nodes.
+  \end{itemize}
+  \vspace{0.8em}
+  \begin{takeaway}
+    Sampling rate should follow measured field variance, not the clock.
+  \end{takeaway}
+\end{frame}
+
+\begin{frame}{The gap in the literature}
+  \vspace{1em}
+  \thbquote{Placement is treated as a one-off design decision, although the field
+    it samples is non-stationary on the scale of days.}{Krause \& Guestrin, JMLR 2008}
+\end{frame}
+
+\section{Method}
+
+\begin{frame}{Problem statement}
+  We minimise the expected reconstruction error under an energy constraint:
+  \begin{keyeq}
+    \begin{equation}
+      \min_{\pi}\; \mathbb{E}\!\left[\lVert x - \hat{x}_{\pi}\rVert_2^2\right]
+      \quad\text{s.t.}\quad \sum_{t} c(\pi_t) \le E_{\max}.
+    \end{equation}
+  \end{keyeq}
+  \begin{theorem}[Convex relaxation]
+    For submodular $c(\cdot)$ the relaxed problem admits a $(1-1/e)$ approximation.
+  \end{theorem}
+\end{frame}
+
+\begin{frame}{Algorithm}
+  \begin{pseudocode}{Variance-driven scheduler}
+    \State $S \gets \emptyset$
+    \While{$\text{budget}(S) < E_{\max}$}
+      \State $v^\ast \gets \arg\max_{v \notin S} \Delta(v \mid S)$
+      \State $S \gets S \cup \{v^\ast\}$
+    \EndWhile
+    \State \Return $S$
+  \end{pseudocode}
+\end{frame}
+
+\begin{frame}[fragile]{Reference implementation}
+  \begin{code}[language=Python]
+def schedule(nodes, budget):
+    active = []
+    while cost(active) < budget:
+        best = max(nodes, key=lambda v: gain(v, active))
+        active.append(best)   # greedy, submodular gain
+    return active
+  \end{code}
+\end{frame}
+
+\section{Results}
+
+\begin{frame}{Field data}
+  \begin{twocols}
+    \thbplaceholder[1.0]{4.2cm}{sensor map}
+    \colbreak
+    \begin{itemize}
+      \item 18 nodes, 11 weeks
+      \item 2.1\,M samples
+      \item 3 dropout events
+    \end{itemize}
+    \vspace{0.6em}
+    Adaptive scheduling kept coverage above 92\,\% throughout.
+  \end{twocols}
+\end{frame}
+
+\begin{frame}{Error versus energy budget}
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[thbplot,xlabel={Energy budget (Wh)},ylabel={RMSE},
+                   legend pos=north east]
+        \addplot coordinates {(1,0.82)(2,0.61)(3,0.44)(4,0.36)(5,0.33)};
+        \addlegendentry{adaptive}
+        \addplot coordinates {(1,0.95)(2,0.84)(3,0.72)(4,0.65)(5,0.60)};
+        \addlegendentry{fixed rate}
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+% Full-bleed figure slide (uncomment once the image exists):
+% \thbfullfigure{deployment.jpg}{Deployment area, 11 weeks of continuous operation.}
+
+\begin{frame}{Headline result}
+  \vfill
+  \thbnumber{39\,\%}{lower reconstruction error than fixed-rate sampling
+    at the same energy budget}
+  \vfill
+\end{frame}
+
+\begin{frame}{Comparison}
+  \begin{center}
+    \begin{tabular}{lrrr}
+      \toprule
+      \thbhead{Method} & \thbhead{RMSE} & \thbhead{Energy} & \thbhead{Uptime} \\
+      \midrule
+      Fixed rate       & 0.72 & 3.0 & 88\,\% \\
+      Round robin      & 0.58 & 3.0 & 90\,\% \\
+      Adaptive (ours)  & \textbf{0.44} & 3.0 & \textbf{92\,\%} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \vspace{0.6em}
+  {\small\color{thbmuted} Averaged over 11 weeks; lower is better.}
+\end{frame}
+
+\begin{frame}{References}
+  \begin{thebibliography}{9}
+    \bibitem{krause08} A.~Krause and C.~Guestrin.
+      \emph{Near-optimal sensor placements}. JMLR, 2008.
+    \bibitem{zhu21} L.~Zhu et al.
+      \emph{Energy-aware scheduling in environmental networks}. Sensors, 2021.
+  \end{thebibliography}
+\end{frame}
+
+\begin{closing}
+  \item Sampling should follow field variance, not the clock.
+  \item 39\,\% lower error at an unchanged energy budget.
+  \item Code and the 11-week dataset are public.
+\end{closing}
+
+\thbbackup
+\begin{frame}{Sensitivity analysis}
+  Slides after \verb|\thbbackup| are not counted in the slide numbering.
+\end{frame}
+
+\end{document}

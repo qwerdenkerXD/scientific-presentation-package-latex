@@ -1,0 +1,470 @@
+%% thbtalk.sty -- a clean, reusable beamer theme for scientific talks
+%% Engine: pdfLaTeX. Aspect ratio: 16:9 (set in \documentclass).
+%% Usage:  \documentclass[aspectratio=169]{beamer}
+%%         \usepackage[lang=en]{thbtalk}
+%%
+%% Options (key=value):
+%%   lang=en|de          built-in labels (default: en); runtime: \thbsetlang{de}
+%%   font=lmodern|helvet|none
+%%   nodots              hide the section navigation dots
+%%   nofooter            hide the footer line
+%%   nonumbers           hide slide numbers
+%%   nosectionslides     do not auto-insert a slide at each \section
+%%
+%% Colours: redefine after loading, e.g.
+%%   \definecolor{thbprimary}{HTML}{004E9E}
+%%   \definecolor{thbaccent}{HTML}{78B833}
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{thbtalk}[2026/09/19 v1.0 Scientific talk theme for beamer]
+
+\RequirePackage{kvoptions}
+\SetupKeyvalOptions{family=thb,prefix=thb@}
+\DeclareStringOption[en]{lang}
+\DeclareStringOption[lmodern]{font}
+\DeclareBoolOption{nodots}
+\DeclareBoolOption{nofooter}
+\DeclareBoolOption{nonumbers}
+\DeclareBoolOption{nosectionslides}
+\DeclareStringOption[none]{notes}
+\ProcessKeyvalOptions*
+
+\RequirePackage{ifthen}
+\RequirePackage{xcolor}
+\RequirePackage{graphicx}
+\RequirePackage{booktabs}
+\RequirePackage{array}
+\RequirePackage{listings}
+\RequirePackage{amsmath,amssymb}
+\RequirePackage{tikz}
+\RequirePackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\RequirePackage{algpseudocode}
+\RequirePackage{mdframed}
+
+\ifthenelse{\equal{\thb@notes}{second}}{\setbeameroption{show notes on second screen=right}}{}
+\ifthenelse{\equal{\thb@notes}{only}}{\setbeameroption{show only notes}}{}
+
+\ifthenelse{\equal{\thb@font}{helvet}}{%
+  \RequirePackage[T1]{fontenc}\RequirePackage{helvet}%
+  \renewcommand{\familydefault}{\sfdefault}}{}
+\ifthenelse{\equal{\thb@font}{lmodern}}{%
+  \RequirePackage[T1]{fontenc}\RequirePackage{lmodern}}{}
+
+% ---------------------------------------------------------------- palette ---
+% TH Bingen house colours. Swap these two lines for any other institution.
+\definecolor{thbprimary}{HTML}{004E9E}   % deep institutional blue
+\definecolor{thbaccent} {HTML}{78B833}   % signal green
+\definecolor{thbink}    {HTML}{1B1E23}
+\definecolor{thbmuted}  {HTML}{6E7781}
+\definecolor{thbline}   {HTML}{D8DEE5}
+\definecolor{thbtint}   {HTML}{EEF3F8}
+\definecolor{thbcodebg} {HTML}{F5F7FA}
+
+% ------------------------------------------------------------ base layout ---
+\usetheme{default}
+\usecolortheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{itemize items}[circle]
+\setbeamertemplate{enumerate items}[default]
+\setbeamertemplate{caption}{\raggedright\insertcaption\par}
+\setbeamertemplate{theorems}[numbered]
+\setbeamercovered{transparent=18}
+
+\newlength{\thbmargin}\setlength{\thbmargin}{0.055\paperwidth}
+\setbeamersize{text margin left=\thbmargin,text margin right=\thbmargin}
+
+\setbeamercolor{normal text}{fg=thbink,bg=white}
+\setbeamercolor{structure}{fg=thbprimary}
+\setbeamercolor{alerted text}{fg=thbaccent}
+\setbeamercolor{title}{fg=thbink}
+\setbeamercolor{subtitle}{fg=thbmuted}
+\setbeamercolor{author}{fg=thbink}
+\setbeamercolor{institute}{fg=thbmuted}
+\setbeamercolor{date}{fg=thbmuted}
+\setbeamercolor{frametitle}{fg=thbink}
+\setbeamercolor{framesubtitle}{fg=thbmuted}
+\setbeamercolor{footline}{fg=thbmuted}
+\setbeamercolor{headline}{fg=thbmuted}
+\setbeamercolor{itemize item}{fg=thbprimary}
+\setbeamercolor{itemize subitem}{fg=thbaccent}
+\setbeamercolor{enumerate item}{fg=thbprimary}
+\setbeamercolor{caption name}{fg=thbmuted}
+\setbeamercolor{bibliography item}{fg=thbprimary}
+\setbeamercolor{bibliography entry author}{fg=thbink}
+\setbeamercolor{bibliography entry title}{fg=thbmuted}
+
+\setbeamerfont{title}{size=\LARGE,series=\bfseries}
+\setbeamerfont{subtitle}{size=\large,series=\mdseries}
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{framesubtitle}{size=\small}
+\setbeamerfont{footline}{size=\tiny}
+\setbeamerfont{caption}{size=\small}
+
+% ---------------------------------------------------------------- blocks ---
+\setbeamercolor{block title}{fg=white,bg=thbprimary}
+\setbeamercolor{block body}{fg=thbink,bg=thbtint}
+\setbeamercolor{block title alerted}{fg=white,bg=thbaccent}
+\setbeamercolor{block body alerted}{fg=thbink,bg=thbtint}
+\setbeamercolor{block title example}{fg=white,bg=thbmuted}
+\setbeamercolor{block body example}{fg=thbink,bg=thbtint}
+\setbeamertemplate{blocks}[rounded][shadow=false]
+
+% ------------------------------------------------------------- languages ---
+\newcommand{\thbsetlang}[1]{%
+  \ifthenelse{\equal{#1}{de}}{%
+    \def\thbname@outline{Gliederung}%
+    \def\thbname@takeaway{Kernaussage}%
+    \def\thbname@refs{Literatur}%
+    \def\thbname@backup{Anhang}%
+    \def\thbname@thanks{Vielen Dank}%
+    \def\thbname@questions{Fragen?}%
+    \def\thbname@figure{Abb.}%
+    \def\thbname@recap{Zum Mitnehmen}%
+    \def\thbname@where{Wo wir stehen}%
+  }{%
+    \def\thbname@outline{Outline}%
+    \def\thbname@takeaway{Takeaway}%
+    \def\thbname@refs{References}%
+    \def\thbname@backup{Backup}%
+    \def\thbname@thanks{Thank you}%
+    \def\thbname@questions{Questions?}%
+    \def\thbname@figure{Fig.}%
+    \def\thbname@recap{Takeaways}%
+    \def\thbname@where{Where we are}%
+  }}
+\thbsetlang{\thb@lang}
+
+% ------------------------------------------------------- title-page data ---
+\def\thb@venue{}
+\newcommand{\thbvenue}[1]{\def\thb@venue{#1}}
+\def\thb@contact{}
+\newcommand{\thbcontact}[1]{\def\thb@contact{#1}}
+\def\thb@logofile{}
+\def\thb@logotext{}
+\newcommand{\thblogo}[1]{\def\thb@logofile{#1}}      % image file, title page only
+\newcommand{\thblogotext}[1]{\def\thb@logotext{#1}}  % text wordmark fallback
+
+\newcommand{\thb@logobox}{%
+  \ifx\thb@logofile\empty
+    \ifx\thb@logotext\empty\else
+      {\color{thbprimary}\bfseries\large\thb@logotext}%
+    \fi
+  \else
+    \includegraphics[height=0.085\paperheight]{\thb@logofile}%
+  \fi}
+
+% ------------------------------------------------------------- furniture ---
+\setbeamertemplate{section in head/foot}{%
+  \hspace{0.25em}{\color{thbprimary}\rule[0.25ex]{0.85ex}{0.85ex}}\hspace{0.25em}}
+\setbeamertemplate{section in head/foot shaded}{%
+  \hspace{0.25em}{\color{thbline}\rule[0.25ex]{0.85ex}{0.85ex}}\hspace{0.25em}}
+
+\setbeamertemplate{headline}{%
+  \ifthb@nodots\else
+    \ifnum\c@section>0\relax
+      \begin{beamercolorbox}[wd=\paperwidth,ht=2.6ex,dp=1.2ex,%
+        leftskip=\thbmargin,rightskip=\thbmargin]{headline}%
+        \hfill\insertsectionnavigationhorizontal{0pt}{}{}%
+      \end{beamercolorbox}%
+    \fi
+  \fi}
+
+\setbeamertemplate{footline}{%
+  \ifthb@nofooter\else
+    \hbox{%
+      \begin{beamercolorbox}[wd=\paperwidth,ht=2.8ex,dp=1.6ex,%
+        leftskip=\thbmargin,rightskip=\thbmargin]{footline}%
+        \usebeamerfont{footline}%
+        \thb@venue\hfill\insertshortauthor\hfill
+        \ifthb@nonumbers\else\insertframenumber\fi
+      \end{beamercolorbox}}%
+  \fi}
+
+% ------------------------------------------------------------ title page ---
+\setbeamertemplate{title page}{%
+  \vspace*{-0.5em}\hfill\thb@logobox\par
+  \vfill
+  {\color{thbaccent}\rule{2.6em}{2.5pt}}\par\vspace{0.9em}
+  {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle\par}
+  \ifx\insertsubtitle\@empty\else
+    \vspace{0.4em}{\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par}\fi
+  \vspace{1.6em}
+  {\usebeamercolor[fg]{author}\insertauthor\par}
+  \vspace{0.25em}
+  {\small\usebeamercolor[fg]{institute}\insertinstitute\par}
+  \vspace{0.6em}
+  {\small\usebeamercolor[fg]{date}\insertdate
+    \ifx\thb@venue\empty\else\;\textbf{\textperiodcentered}\; \thb@venue\fi\par}
+  \vfill}
+
+\newcommand{\thbtitleframe}{%
+  {\setbeamertemplate{headline}{}\setbeamertemplate{footline}{}%
+   \begin{frame}[plain,noframenumbering]\titlepage\end{frame}}}
+
+% ------------------------------------------------------- section slides ---
+\newcommand{\thb@twodigit}[1]{\ifnum#1<10 0\fi\number#1}
+\newcommand{\thb@sectionframe}{%
+  {\setbeamercolor{background canvas}{bg=thbprimary}%
+   \setbeamertemplate{headline}{}\setbeamertemplate{footline}{}%
+   \setbeamertemplate{section in toc}{%
+     \leavevmode{\color{white}\inserttocsection}\par\vspace{0.45em}}%
+   \setbeamertemplate{section in toc shaded}[default][40]%
+   \setbeamercolor{section in toc shaded}{fg=white}%
+   \setbeamertemplate{subsection in toc}{}%
+   \begin{frame}[plain,noframenumbering]
+     \vfill
+     \begin{columns}[T,onlytextwidth]
+       \begin{column}{0.62\textwidth}
+         {\color{thbaccent}\fontsize{60}{60}\selectfont\bfseries\thb@twodigit{\value{section}}}\par
+         \vspace{0.45em}
+         {\color{thbaccent}\rule{2.6em}{2.5pt}}\par\vspace{0.7em}
+         {\color{white}\usebeamerfont{title}\insertsectionhead\par}
+       \end{column}\hfill
+       \begin{column}{0.32\textwidth}
+         \raggedright\small
+         \tableofcontents[currentsection,hideallsubsections,sectionstyle=show/shaded]
+       \end{column}
+     \end{columns}
+     \vfill
+   \end{frame}}}
+\AtBeginSection[]{\ifthb@nosectionslides\else\thb@sectionframe\fi}
+
+\newcommand{\thboutlinenote}[2]{\expandafter\def\csname thb@note@#1\endcsname{#2}}
+\newcommand{\thb@note}[1]{%
+  \ifcsname thb@note@#1\endcsname\csname thb@note@#1\endcsname\fi}
+\newif\ifthb@tocnotes\thb@tocnotestrue
+\newif\ifthb@tocrules\thb@tocrulestrue
+
+% \thboutline            single column, all subsections
+% \thboutline[4]         two columns, break after section 4 (for long talks)
+% \thboutlinecompact     titles only: no glosses, no subsections, no rules
+\newcommand{\thboutline}[1][0]{%
+  \begin{frame}{\thbname@outline}
+    \vspace{0.8em}
+    \ifnum#1>0\relax
+      \begin{columns}[T,onlytextwidth]
+        \begin{column}{0.46\textwidth}\tableofcontents[sections={1-#1}]\end{column}\hfill
+        \begin{column}{0.46\textwidth}\tableofcontents[sections={\the\numexpr#1+1\relax-}]\end{column}
+      \end{columns}
+    \else
+      \tableofcontents
+    \fi
+  \end{frame}}
+\newcommand{\thboutlinecompact}[1][0]{%
+  {\thb@tocnotesfalse\thb@tocrulesfalse
+   \begin{frame}{\thbname@outline}
+     \vspace{0.8em}
+     \ifnum#1>0\relax
+       \begin{columns}[T,onlytextwidth]
+         \begin{column}{0.46\textwidth}\tableofcontents[sections={1-#1},hideallsubsections]\end{column}\hfill
+         \begin{column}{0.46\textwidth}\tableofcontents[sections={\the\numexpr#1+1\relax-},hideallsubsections]\end{column}
+       \end{columns}
+     \else
+       \tableofcontents[hideallsubsections]
+     \fi
+   \end{frame}}}
+\setbeamertemplate{section in toc}{%
+  \leavevmode
+  \begin{minipage}[t]{0.055\textwidth}%
+    \raggedright{\color{thbaccent}\bfseries\large\inserttocsectionnumber}%
+  \end{minipage}%
+  \begin{minipage}[t]{0.9\textwidth}%
+    {\color{thbink}\large\inserttocsection}%
+    \ifthb@tocnotes
+      \ifcsname thb@note@\inserttocsectionnumber\endcsname
+        \par\vspace{0.15em}{\color{thbmuted}\small\thb@note{\inserttocsectionnumber}}%
+      \fi
+    \fi
+  \end{minipage}\par
+  \ifthb@tocrules
+    \vspace{0.5em}{\color{thbline}\rule{\textwidth}{0.4pt}}\par\vspace{0.5em}%
+  \else
+    \vspace{0.55em}%
+  \fi}
+\setbeamertemplate{subsection in toc}{%
+  \leavevmode\hspace{0.055\textwidth}%
+  {\color{thbmuted}\small\inserttocsubsection}\par\vspace{0.25em}}
+
+\newcommand{\thbclosingframe}[1][\thbname@questions]{%
+  {\setbeamercolor{background canvas}{bg=thbprimary}%
+   \setbeamertemplate{headline}{}\setbeamertemplate{footline}{}%
+   \begin{frame}[plain,noframenumbering]
+     \vfill
+     {\color{thbaccent}\rule{2.6em}{2.5pt}}\par\vspace{0.8em}
+     {\color{white}\usebeamerfont{title}#1\par}
+     \vspace{0.8em}
+     {\color{thbtint}\small\insertauthor\ \textbf{\textperiodcentered}\ \insertinstitute\par}
+     \ifx\thb@contact\empty\else
+       \vspace{0.4em}{\color{thbtint}\small\thb@contact\par}\fi
+     \vfill
+   \end{frame}}}
+
+% Closing slide that keeps the recap on screen during Q&A:
+%   \begin{closing}[Questions?] \item ... \end{closing}
+\newenvironment{closing}[1][\thbname@questions]{%
+  \def\thb@closingtitle{#1}%
+  \setbeamercolor{background canvas}{bg=thbprimary}%
+  \setbeamertemplate{headline}{}\setbeamertemplate{footline}{}%
+  \setbeamercolor{itemize item}{fg=thbaccent}%
+  \setbeamercolor{normal text}{fg=white}\usebeamercolor[fg]{normal text}%
+  \begin{frame}[plain,noframenumbering]
+    \vfill
+    \begin{columns}[T,onlytextwidth]
+      \begin{column}{0.52\textwidth}
+        {\color{thbaccent}\rule{2.6em}{2.5pt}}\par\vspace{0.8em}
+        {\color{white}\usebeamerfont{title}\thb@closingtitle\par}
+        \vspace{1.0em}
+        {\color{thbtint}\small\insertauthor\ \textbf{\textperiodcentered}\ \insertinstitute\par}
+        \ifx\thb@contact\empty\else
+          \vspace{0.35em}{\color{thbtint}\small\thb@contact\par}\fi
+      \end{column}\hfill
+      \begin{column}{0.40\textwidth}
+        {\color{thbaccent}\footnotesize\bfseries\MakeUppercase{\thbname@recap}\par}\vspace{0.6em}
+        \color{white}\begin{itemize}}%
+ {       \end{itemize}
+      \end{column}
+    \end{columns}
+    \vfill
+  \end{frame}}
+
+% Standalone progress slide, usable anywhere mid-talk
+\newcommand{\thbagenda}[1][\thbname@where]{%
+  \begin{frame}{#1}
+    \vspace{0.6em}
+    \tableofcontents[currentsection,hideallsubsections,sectionstyle=show/shaded]
+  \end{frame}}
+
+% ------------------------------------------------------ frame title look ---
+\setbeamertemplate{frametitle}{%
+  \vspace{0.9em}%
+  \begin{beamercolorbox}[wd=\paperwidth,leftskip=\thbmargin,rightskip=\thbmargin]{frametitle}%
+    \usebeamerfont{frametitle}\insertframetitle\par
+    \ifx\insertframesubtitle\@empty\else
+      \vspace{0.15em}{\usebeamerfont{framesubtitle}\usebeamercolor[fg]{framesubtitle}%
+      \insertframesubtitle\par}\fi
+    \vspace{0.35em}{\color{thbaccent}\rule{2.2em}{2pt}}%
+  \end{beamercolorbox}%
+  \vspace{0.4em}}
+
+% ------------------------------------------------- content helper macros ---
+% Highlighted takeaway box
+\newenvironment{takeaway}[1][\thbname@takeaway]{\begin{alertblock}{#1}}{\end{alertblock}}
+
+% Theorems: left accent rule on tint, no header bar
+\setbeamertemplate{theorem begin}{%
+  \begin{mdframed}[hidealllines=true,leftline=true,linewidth=3pt,%
+    linecolor=thbaccent,backgroundcolor=thbtint,%
+    innerleftmargin=12pt,innerrightmargin=12pt,%
+    innertopmargin=9pt,innerbottommargin=9pt,skipabove=8pt,skipbelow=6pt]%
+  {\bfseries\inserttheoremname\ \inserttheoremnumber
+   \ifx\inserttheoremaddition\@empty\else\ (\inserttheoremaddition)\fi}\par\vspace{0.3em}}
+\setbeamertemplate{theorem end}{\end{mdframed}}
+
+% Key equation on a tinted band (no header bar)
+\newenvironment{keyeq}{%
+  \begin{mdframed}[hidealllines=true,backgroundcolor=thbtint,%
+    innertopmargin=12pt,innerbottommargin=12pt,skipabove=8pt,skipbelow=6pt]%
+  \centering}{\end{mdframed}}
+
+% Single headline result:  \thbnumber{42\,\%}{fewer transmissions than fixed rate}
+\newcommand{\thbnumber}[2]{%
+  \begin{center}
+    {\color{thbprimary}\fontsize{56}{56}\selectfont\bfseries #1}\par
+    \vspace{0.5em}{\color{thbaccent}\rule{2.2em}{2pt}}\par
+    \vspace{0.7em}{\large #2\par}
+  \end{center}}
+
+% Cited statement:  \thbquote{...}{Source, Year}
+\newcommand{\thbquote}[2]{%
+  \begin{mdframed}[hidealllines=true,leftline=true,linewidth=3pt,linecolor=thbaccent,%
+    backgroundcolor=white,innerleftmargin=16pt,innerrightmargin=0pt,%
+    innertopmargin=4pt,innerbottommargin=4pt,skipabove=8pt]%
+    {\large\itshape #1\par}\vspace{0.5em}{\small\color{thbmuted}#2\par}
+  \end{mdframed}}
+
+% Full-bleed figure slide with caption strip
+\newcommand{\thbfullfigure}[2]{%
+  {\setbeamertemplate{headline}{}\setbeamertemplate{footline}{}%
+   \usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{#1}}%
+   \begin{frame}[plain]
+     \vfill
+     \hspace*{-\thbmargin}%
+     \colorbox{thbink}{\parbox{\dimexpr\paperwidth-2\fboxsep}{%
+       \hspace{\thbmargin}\color{white}\small #2}}%
+   \end{frame}}}
+
+% Two balanced columns:  \begin{twocols} ... \colbreak ... \end{twocols}
+\newcommand{\thb@colw}{0.48}
+\newenvironment{twocols}[1][0.48]{%
+  \renewcommand{\thb@colw}{#1}%
+  \begin{columns}[T,onlytextwidth]\begin{column}{\thb@colw\textwidth}}%
+  {\end{column}\end{columns}}
+\newcommand{\colbreak}{\end{column}\hfill\begin{column}{\thb@colw\textwidth}}
+
+% Figure with caption, centred
+\newcommand{\thbfigure}[3][0.72]{%
+  \begin{center}
+    \includegraphics[width=#1\textwidth]{#2}\\[0.5em]
+    {\small\color{thbmuted}#3}
+  \end{center}}
+
+% Placeholder box, so a talk compiles before the real figures exist
+\newcommand{\thbplaceholder}[3][0.7]{%
+  \begin{center}
+    \begin{tikzpicture}
+      \fill[thbtint] (0,0) rectangle (#1\textwidth,#2);
+      \draw[thbline] (0,0) rectangle (#1\textwidth,#2);
+      \node[thbmuted,font=\small\ttfamily]
+        at (0.5*#1\textwidth,0.5*#2) {#3};
+    \end{tikzpicture}
+  \end{center}}
+
+% Table helper: booktabs rules with the house colour
+\newcommand{\thbhead}[1]{{\color{thbprimary}\bfseries #1}}
+
+% Code listings
+\lstdefinestyle{thbcode}{
+  backgroundcolor=\color{thbcodebg},
+  basicstyle=\ttfamily\footnotesize\color{thbink},
+  keywordstyle=\color{thbprimary}\bfseries,
+  commentstyle=\color{thbmuted}\itshape,
+  stringstyle=\color{thbaccent},
+  numbers=left, numberstyle=\ttfamily\scriptsize\color{thbmuted}, numbersep=12pt,
+  frame=leftline, framerule=2pt, rulecolor=\color{thbprimary},
+  framesep=8pt, xleftmargin=2.6em, framexleftmargin=2.6em,
+  breaklines=true, showstringspaces=false, tabsize=2,
+  aboveskip=0.8em, belowskip=0.4em}
+\lstset{style=thbcode}
+\lstnewenvironment{code}[1][]{\lstset{#1}}{}
+
+% Pseudocode: \begin{pseudocode}{Caption} ... \end{pseudocode}
+\newenvironment{pseudocode}[1]{%
+  \begin{block}{#1}\begin{algorithmic}[1]}%
+  {\end{algorithmic}\end{block}}
+
+% pgfplots house style
+\pgfplotsset{thbplot/.style={
+  width=0.9\textwidth, height=0.55\textheight,
+  axis line style={thbline}, tick style={thbline},
+  every axis label/.append style={thbmuted,font=\small},
+  tick label style={thbmuted,font=\footnotesize},
+  legend style={draw=thbline,font=\footnotesize,fill=white},
+  grid=major, grid style={thbline,dashed},
+  cycle list={{thbprimary,thick},{thbaccent,thick},{thbmuted,thick,dashed}}}}
+
+% References frame (works with plain \bibitem or biblatex \printbibliography)
+\setbeamertemplate{bibliography item}{\color{thbaccent}\rule[0.25ex]{0.8ex}{0.8ex}}
+
+% Backup slides: stop counting towards the total
+\newcommand{\thbbackup}{%
+  \appendix
+  \thb@sectionframe@backup}
+\newcommand{\thb@sectionframe@backup}{%
+  {\setbeamercolor{background canvas}{bg=thbprimary}%
+   \setbeamertemplate{headline}{}\setbeamertemplate{footline}{}%
+   \begin{frame}[plain,noframenumbering]
+     \vfill{\color{white}\usebeamerfont{title}\thbname@backup\par}\vfill
+   \end{frame}}}
+
+\endinput
