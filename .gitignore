@@ -13,3 +13,11 @@
 !/test/coverage.tex
 !/test/logo.png
 !/test/photo.png
+!/test/design.tex
+!/test/design_check.py
+!/test/stripes.png
+
+!/design/
+!/design/thbtalk-preview.html
+!/design/deck-stage.js
+!/design/support.js

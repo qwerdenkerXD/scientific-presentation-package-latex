@@ -3,6 +3,10 @@
 pdfLaTeX, 16:9, one `.sty` file. Drop `thbtalk.sty` next to your `.tex` file (or into
 `~/texmf/tex/latex/thbtalk/`) and compile `demo.tex` twice.
 
+The look follows the design in `design/thbtalk-preview.html` (open it in a browser). The
+package sets its own type scale from that design: body text is 8 pt, whatever size option
+you give `\documentclass`, and `\small`, `\large` etc. follow the design's steps.
+
 ## Minimal preamble
 
 ```latex
@@ -29,7 +33,7 @@ pdfLaTeX, 16:9, one `.sty` file. Drop `thbtalk.sty` next to your `.tex` file (or
 | Option | Effect |
 |---|---|
 | `lang=en` \| `lang=de` | built-in labels (Outline/Gliederung, Backup/Anhang, …) |
-| `font=lmodern` \| `helvet` \| `none` | text font; default `lmodern` |
+| `font=source` \| `lmodern` \| `helvet` \| `none` | default `source`: the design's fonts — Source Sans for text, Source Serif for quotes and maths, Source Code for code. `none` leaves fonts to you; they must scale to any size (e.g. `lmodern`) |
 | `nodots` | hide the section navigation dots in the header |
 | `nofooter` | hide the footer line |
 | `nonumbers` | hide slide numbers |
@@ -66,6 +70,9 @@ The labels are `outline`, `takeaway`, `refs`, `backup`, `thanks`, `questions`, `
   `\thbcontact{mail · DOI}`
 - `\thbbackup` — divider slide before the backup slides; they are compiled and numbered as usual
 
+Every slide is numbered, the title and divider slides included, so the number in the footer
+is the page of the PDF (overlays aside).
+
 ## Content helpers
 
 ```latex
@@ -89,7 +96,7 @@ The labels are `outline`, `takeaway`, `refs`, `backup`, `thanks`, `questions`, `
 
 \begin{keyeq}\begin{equation} ... \end{equation}\end{keyeq}   % equation on a tinted band
 
-\thbnumber{39\,\%}{lower error at the same energy budget}      % one headline result
+\thbnumber{39\,\%}{lower error at the same energy budget}      % one headline result, centred in the slide
 \thbquote{Statement.}{Author, Year}                            % cited statement
 \thbfullfigure{photo.jpg}{Caption strip along the bottom.}     % full-bleed image slide
 \thbcmd{thbbackup}          % typesets \thbbackup; unlike \verb, no [fragile] needed
@@ -99,7 +106,10 @@ Equations, theorems and code are deliberately styled differently so the audience
 them apart at a glance: equations sit on a tinted band, theorems carry a green left rule,
 code a blue one. Blocks and `takeaway` keep the filled header bar.
 
-Tables: `booktabs` is loaded; use `\thbhead{Column}` for header cells.
+Some boxes are capped at the design's widths: `takeaway` 1150 px, theorems and `pseudocode`
+1250 px, `code` 1350 px, `\thbquote` 1400 px (the design is 1920 px wide; the text 1708 px).
+Tables: `booktabs` is loaded; use `\thbhead{Column}` for header cells. Every `tabular` gets
+the design's airy rows and 28 px cell padding.
 Plots: `pgfplots` is loaded; add `thbplot` to the axis options for the house style.
 Theorems: `theorem`, `lemma`, `definition`, `proof` are numbered and use the palette.
 
@@ -130,9 +140,10 @@ the exact ones from the corporate design sheet if they differ. Supporting neutra
 
 ## Required packages
 
-LaTeX 2020-10 or newer, `beamer`, `kvoptions`, `ifthen`, `xcolor`, `graphicx`, `booktabs`,
-`array`, `listings`, `amsmath`, `amssymb`, `tikz`, `pgfplots`, `algpseudocode`, `mdframed`
-— all in a standard TeX Live / MiKTeX / Overleaf installation.
+LaTeX 2020-10 or newer, `beamer`, `kvoptions`, `etoolbox`, `ifthen`, `xcolor`, `graphicx`,
+`booktabs`, `array`, `listings`, `amsmath`, `amssymb`, `tikz`, `pgfplots`, `algpseudocode`,
+`tcolorbox`, and for the fonts `lmodern`, `sourcesanspro`, `sourceserifpro`, `sourcecodepro`,
+`mathastext` — all in a standard TeX Live / MiKTeX / Overleaf installation.
 
 ## Changing the package
 
@@ -147,3 +158,16 @@ compares them pixel by pixel. Exit code 0 means nothing looks different; otherwi
 pages are listed and marked red in `test/build/<variant>/diff-page-NN.png`. Needs `pdflatex`,
 `pdftocairo` (poppler-utils) and Python with Pillow. When you add a command, add it to
 `test/coverage.tex` as well.
+
+To check the package against the design:
+
+```sh
+python3 test/design_check.py     # all 13 design slides; or: python3 test/design_check.py 4 13
+```
+
+It renders the design with Playwright, builds `test/design.tex` (the same content) and writes
+side-by-side and 50 % blend images to `test/build/design/`. For each slide it prints the rows
+with ink in both versions and their vertical offset, so a drift shows up as a number. All sizes
+in `thbtalk.sty` are written in design pixels (`\thb@px`), so they can be read against the
+HTML directly. Set `THB_CHROMIUM` to a Chromium executable if Playwright's own browser is
+not installed.

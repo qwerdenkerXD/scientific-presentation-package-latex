@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:ital,wght@0,400;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #1B1E23; }
+  a { color: #004E9E; }
+  a:hover { color: #78B833; }
+</style>
+</helmet>
+<x-import component-from-global-scope="deck-stage" from="./deck-stage.js" width="1920" height="1080" hint-size="100%,100%">
+
+  <section data-label="Title" data-screen-label="01" data-speaker-notes="Title slide: logo top right, accent rule, venue in the date line." style="background:#fff;font-family:'Source Sans 3',Helvetica,Arial,sans-serif;color:#1B1E23;display:flex;flex-direction:column;padding:70px 106px 60px">
+    <div style="display:flex;justify-content:flex-end">
+      <div style="color:#004E9E;font-weight:700;font-size:40px;letter-spacing:-0.01em">TH Bingen</div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1400px">
+      <div style="width:70px;height:7px;background:#78B833"></div>
+      <div style="font-size:74px;font-weight:700;line-height:1.12;margin-top:28px;letter-spacing:-0.015em">Adaptive Sampling for Sparse Sensor Networks</div>
+      <div style="font-size:38px;color:#6E7781;margin-top:16px">A field study on the Upper Rhine</div>
+      <div style="font-size:34px;margin-top:64px">A. Musterfrau</div>
+      <div style="font-size:28px;color:#6E7781;margin-top:10px">Technische Hochschule Bingen</div>
+      <div style="font-size:28px;color:#6E7781;margin-top:20px">19 September 2026 · ICSE Workshop, Mainz</div>
+    </div>
+  </section>
+
+  <section data-label="Outline" data-screen-label="02" data-speaker-notes="Outline slide via \thboutline." style="background:#fff;font-family:'Source Sans 3',Helvetica,Arial,sans-serif;color:#1B1E23;display:flex;flex-direction:column;padding:0">
+    <div style="display:flex;justify-content:flex-end;gap:14px;padding:26px 106px 0"></div>
+    <div style="padding:20px 106px 0">
+      <div style="font-size:58px;font-weight:700;letter-spacing:-0.01em">Outline</div>
+      <div style="width:56px;height:6px;background:#78B833;margin-top:14px"></div>
+    </div>
+    <div style="flex:1;padding:50px 106px 0;display:flex;flex-direction:column">
+      <div style="display:grid;grid-template-columns:70px 1fr;padding-bottom:26px;border-bottom:1px solid #D8DEE5">
+        <div style="color:#78B833;font-size:40px;font-weight:700">1</div>
+        <div><div style="font-size:42px">Motivation</div><div style="font-size:28px;color:#6E7781;margin-top:8px">Where static sampling breaks down in the field</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:70px 1fr;padding:26px 0;border-bottom:1px solid #D8DEE5">
+        <div style="color:#78B833;font-size:40px;font-weight:700">2</div>
+        <div><div style="font-size:42px">Method</div><div style="font-size:28px;color:#6E7781;margin-top:8px">A variance-driven scheduler with a submodular guarantee</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:70px 1fr;padding:26px 0;border-bottom:1px solid #D8DEE5">
+        <div style="color:#78B833;font-size:40px;font-weight:700">3</div>
+        <div><div style="font-size:42px">Results</div><div style="font-size:28px;color:#6E7781;margin-top:8px">Eleven weeks on the Upper Rhine, 18 nodes</div></div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;color:#6E7781;font-size:24px;padding:0 106px 26px"><span>ICSE Workshop, Mainz</span><span>A. Musterfrau</span><span>2</span></div>
+  </section>
+
+  <section data-label="Section divider" data-screen-label="03" data-speaker-notes="Auto-inserted at every \section." style="background:#004E9E;font-family:'Source Sans 3',Helvetica,Arial,sans-serif;display:flex;flex-direction:column;justify-content:center;padding:0 106px">
+    <div style="display:grid;grid-template-columns:1.9fr 1fr;gap:90px;align-items:center">
+      <div>
+        <div style="color:#78B833;font-size:150px;font-weight:700;line-height:0.9;letter-spacing:-0.03em">01</div>
+        <div style="width:70px;height:7px;background:#78B833;margin-top:34px"></div>
+        <div style="color:#fff;font-size:74px;font-weight:700;margin-top:24px;letter-spacing:-0.015em">Motivation</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px;border-left:2px solid rgba(255,255,255,0.28);padding-left:40px">
+        <div style="color:#fff;font-size:32px">Motivation</div>
+        <div style="color:rgba(255,255,255,0.55);font-size:32px">Method</div>
+        <div style="color:rgba(255,255,255,0.55);font-size:32px">Results</div>
+      </div>
+    </div>
+  </section>
+
+  <section data-label="Bullets + takeaway" data-screen-label="04" data-speaker-notes="Frame title with subtitle, itemize, takeaway box." style="background:#fff;font-family:'Source Sans 3',Helvetica,Arial,sans-serif;color:#1B1E23;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:flex-end;gap:12px;padding:26px 106px 0">
+      <span style="width:14px;height:14px;background:#004E9E"></span>
+      <span style="width:14px;height:14px;background:#D8DEE5"></span>
+      <span style="width:14px;height:14px;background:#D8DEE5"></span>
+    </div>
+    <div style="padding:22px 106px 0">
+      <div style="font-size:58px;font-weight:700;letter-spacing:-0.01em">Why sparse networks fail</div>
+      <div style="font-size:30px;color:#6E7781;margin-top:8px">Three observations from two deployments</div>
+      <div style="width:56px;height:6px;background:#78B833;margin-top:16px"></div>
+    </div>
+    <div style="flex:1;padding:46px 106px 0;display:flex;flex-direction:column;gap:24px">
+      <div style="display:flex;gap:22px;font-size:36px;line-height:1.35"><span style="color:#004E9E;font-size:26px;line-height:1.7">●</span><span>Node dropout is bursty, not uniform.</span></div>
+      <div style="display:flex;gap:22px;font-size:36px;line-height:1.35"><span style="color:#004E9E;font-size:26px;line-height:1.7">●</span><span>Static sampling wastes 40 % of the energy budget.</span></div>
+      <div style="display:flex;gap:22px;font-size:36px;line-height:1.35"><span style="color:#004E9E;font-size:26px;line-height:1.7">●</span><span>Reconstruction error grows superlinearly below 12 active nodes.</span></div>
+      <div style="margin-top:26px;border-radius:8px;overflow:hidden;max-width:1150px">
+        <div style="background:#78B833;color:#fff;font-weight:700;font-size:30px;padding:12px 24px">Takeaway</div>
+        <div style="background:#EEF3F8;font-size:34px;padding:22px 24px">Sampling rate should follow measured field variance, not the clock.</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;color:#6E7781;font-size:24px;padding:0 106px 26px"><span>ICSE Workshop, Mainz</span><span>A. Musterfrau</span><span>4</span></div>
+  </section>
+
+  <section data-label="Quote" data-screen-label="05" data-speaker-notes="\thbquote: cited statement with accent rule." style="background:#fff;font-family:'Source Sans 3',Helvetica,Arial,sans-serif;color:#1B1E23;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:flex-end;gap:12px;padding:26px 106px 0"><span style="width:14px;height:14px;background:#004E9E"></span><span style="width:14px;height:14px;background:#D8DEE5"></span><span style="width:14px;height:14px;background:#D8DEE5"></span></div>
+    <div style="padding:22px 106px 0"><div style="font-size:58px;font-weight:700;letter-spacing:-0.01em">The gap in the literature</div><div style="width:56px;height:6px;background:#78B833;margin-top:16px"></div></div>
+    <div style="flex:1;padding:70px 106px 0;display:flex;flex-direction:column;justify-content:flex-start">
+      <div style="border-left:6px solid #78B833;padding:6px 0 6px 34px;max-width:1400px">
+        <div style="font-family:'Source Serif 4',Georgia,serif;font-style:italic;font-size:44px;line-height:1.35">Placement is treated as a one-off design decision, although the field it samples is non-stationary on the scale of days.</div>
+        <div style="color:#6E7781;font-size:28px;margin-top:22px">Krause &amp; Guestrin, JMLR 2008</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;color:#6E7781;font-size:24px;padding:0 106px 26px"><span>ICSE Workshop, Mainz</span><span>A. Musterfrau</span><span>5</span></div>
+  </section>
+
+  <section data-label="Equation + theorem" data-screen-label="05" data-speaker-notes="Numbered equation and numbered theorem environment." style="background:#fff;font-family:'Source Sans 3',Helvetica,Arial,sans-serif;color:#1B1E23;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:flex-end;gap:12px;padding:26px 106px 0">
+      <span style="width:14px;height:14px;background:#D8DEE5"></span>
+      <span style="width:14px;height:14px;background:#004E9E"></span>
+      <span style="width:14px;height:14px;background:#D8DEE5"></span>
+    </div>
+    <div style="padding:22px 106px 0">
+      <div style="font-size:58px;font-weight:700;letter-spacing:-0.01em">Problem statement</div>
+      <div style="width:56px;height:6px;background:#78B833;margin-top:16px"></div>
+    </div>
+    <div style="flex:1;padding:46px 106px 0">
+      <div style="font-size:34px">We minimise the expected reconstruction error under an energy constraint:</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:60px;margin:40px 0 0;background:#EEF3F8;padding:28px 34px">
+        <div style="font-family:'Source Serif 4',Georgia,serif;font-style:italic;font-size:44px">min<sub style="font-size:26px">π</sub> &nbsp; E [ ‖ x − <span style="display:inline-block;position:relative;padding-top:0.12em"><span style="position:absolute;top:-0.42em;left:50%;transform:translateX(-50%);font-size:0.85em">^</span>x</span><sub style="font-size:26px">π</sub> ‖<sup style="font-size:26px">2</sup><sub style="font-size:26px">2</sub> ] &nbsp;&nbsp; s.t. &nbsp;&nbsp; Σ<sub style="font-size:26px">t</sub> c(π<sub style="font-size:26px">t</sub>) ≤ E<sub style="font-size:26px">max</sub>.</div>
+        <div style="font-family:'Source Serif 4',Georgia,serif;font-size:36px">(1)</div>
+      </div>
+      <div style="margin-top:46px;background:#EEF3F8;border-left:6px solid #78B833;padding:22px 30px;max-width:1250px">
+        <div style="font-weight:700;font-size:32px">Theorem 1 (Convex relaxation)</div>
+        <div style="font-size:34px;margin-top:10px">For submodular c(·) the relaxed problem admits a (1 − 1/e) approximation.</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;color:#6E7781;font-size:24px;padding:0 106px 26px"><span>ICSE Workshop, Mainz</span><span>A. Musterfrau</span><span>6</span></div>
+  </section>
+
+  <section data-label="Pseudocode" data-screen-label="06" data-speaker-notes="pseudocode environment: algpseudocode inside a block." style="background:#fff;font-family:'Source Sans 3',Helvetica,Arial,sans-serif;color:#1B1E23;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:flex-end;gap:12px;padding:26px 106px 0">
+      <span style="width:14px;height:14px;background:#D8DEE5"></span>
+      <span style="width:14px;height:14px;background:#004E9E"></span>
+      <span style="width:14px;height:14px;background:#D8DEE5"></span>
+    </div>
+    <div style="padding:22px 106px 0">
+      <div style="font-size:58px;font-weight:700;letter-spacing:-0.01em">Algorithm</div>
+      <div style="width:56px;height:6px;background:#78B833;margin-top:16px"></div>
+    </div>
+    <div style="flex:1;padding:46px 106px 0">
+      <div style="border-radius:8px;overflow:hidden;max-width:1250px">
+        <div style="background:#004E9E;color:#fff;font-weight:700;font-size:30px;padding:12px 24px">Variance-driven scheduler</div>
+        <div style="background:#EEF3F8;padding:24px;font-family:'Source Serif 4',Georgia,serif;font-size:32px;line-height:1.7">
+          <div style="display:flex;gap:26px"><span style="color:#6E7781;width:34px;text-align:right">1</span><span><i>S</i> ← ∅</span></div>
+          <div style="display:flex;gap:26px"><span style="color:#6E7781;width:34px;text-align:right">2</span><span><b style="font-family:'Source Sans 3',sans-serif;font-size:28px">while</b> budget(<i>S</i>) &lt; <i>E</i><sub style="font-size:22px">max</sub> <b style="font-family:'Source Sans 3',sans-serif;font-size:28px">do</b></span></div>
+          <div style="display:flex;gap:26px"><span style="color:#6E7781;width:34px;text-align:right">3</span><span style="padding-left:40px"><i>v</i>* ← arg max<sub style="font-size:22px">v ∉ S</sub> Δ(<i>v</i> | <i>S</i>)</span></div>
+          <div style="display:flex;gap:26px"><span style="color:#6E7781;width:34px;text-align:right">4</span><span style="padding-left:40px"><i>S</i> ← <i>S</i> ∪ {<i>v</i>*}</span></div>
+          <div style="display:flex;gap:26px"><span style="color:#6E7781;width:34px;text-align:right">5</span><span><b style="font-family:'Source Sans 3',sans-serif;font-size:28px">end while</b></span></div>
+          <div style="display:flex;gap:26px"><span style="color:#6E7781;width:34px;text-align:right">6</span><span><b style="font-family:'Source Sans 3',sans-serif;font-size:28px">return</b> <i>S</i></span></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;color:#6E7781;font-size:24px;padding:0 106px 26px"><span>ICSE Workshop, Mainz</span><span>A. Musterfrau</span><span>7</span></div>
+  </section>
+
+  <section data-label="Code listing" data-screen-label="07" data-speaker-notes="code environment, frame must be [fragile]." style="background:#fff;font-family:'Source Sans 3',Helvetica,Arial,sans-serif;color:#1B1E23;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:flex-end;gap:12px;padding:26px 106px 0">
+      <span style="width:14px;height:14px;background:#D8DEE5"></span>
+      <span style="width:14px;height:14px;background:#004E9E"></span>
+      <span style="width:14px;height:14px;background:#D8DEE5"></span>
+    </div>
+    <div style="padding:22px 106px 0">
+      <div style="font-size:58px;font-weight:700;letter-spacing:-0.01em">Reference implementation</div>
+      <div style="width:56px;height:6px;background:#78B833;margin-top:16px"></div>
+    </div>
+    <div style="flex:1;padding:46px 106px 0">
+      <div style="background:#F5F7FA;border-left:4px solid #004E9E;padding:30px 34px;font-family:'JetBrains Mono',monospace;font-size:30px;line-height:1.65;max-width:1350px;display:flex;flex-direction:column">
+        <div style="display:flex;gap:26px"><span style="color:#6E7781;width:34px;text-align:right;flex:none">1</span><span style="white-space:pre"><span style="color:#004E9E;font-weight:500">def</span> schedule(nodes, budget):</span></div>
+        <div style="display:flex;gap:26px"><span style="color:#6E7781;width:34px;text-align:right;flex:none">2</span><span style="white-space:pre">    active = []</span></div>
+        <div style="display:flex;gap:26px"><span style="color:#6E7781;width:34px;text-align:right;flex:none">3</span><span style="white-space:pre">    <span style="color:#004E9E;font-weight:500">while</span> cost(active) &lt; budget:</span></div>
+        <div style="display:flex;gap:26px"><span style="color:#6E7781;width:34px;text-align:right;flex:none">4</span><span style="white-space:pre">        best = max(nodes, key=<span style="color:#004E9E;font-weight:500">lambda</span> v: gain(v, active))</span></div>
+        <div style="display:flex;gap:26px"><span style="color:#6E7781;width:34px;text-align:right;flex:none">5</span><span style="white-space:pre">        active.append(best)   <span style="color:#6E7781;font-style:italic"># greedy, submodular gain</span></span></div>
+        <div style="display:flex;gap:26px"><span style="color:#6E7781;width:34px;text-align:right;flex:none">6</span><span style="white-space:pre">    <span style="color:#004E9E;font-weight:500">return</span> active</span></div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;color:#6E7781;font-size:24px;padding:0 106px 26px"><span>ICSE Workshop, Mainz</span><span>A. Musterfrau</span><span>8</span></div>
+  </section>
+
+  <section data-label="Two columns" data-screen-label="08" data-speaker-notes="twocols environment with a figure placeholder." style="background:#fff;font-family:'Source Sans 3',Helvetica,Arial,sans-serif;color:#1B1E23;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:flex-end;gap:12px;padding:26px 106px 0">
+      <span style="width:14px;height:14px;background:#D8DEE5"></span>
+      <span style="width:14px;height:14px;background:#D8DEE5"></span>
+      <span style="width:14px;height:14px;background:#004E9E"></span>
+    </div>
+    <div style="padding:22px 106px 0">
+      <div style="font-size:58px;font-weight:700;letter-spacing:-0.01em">Field data</div>
+      <div style="width:56px;height:6px;background:#78B833;margin-top:16px"></div>
+    </div>
+    <div style="flex:1;padding:46px 106px 0;display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:start">
+      <div style="background:#EEF3F8;border:1px solid #D8DEE5;height:380px;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:28px;color:#6E7781">sensor map</div>
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div style="display:flex;gap:20px;font-size:34px"><span style="color:#004E9E;font-size:24px;line-height:1.7">●</span>18 nodes, 11 weeks</div>
+        <div style="display:flex;gap:20px;font-size:34px"><span style="color:#004E9E;font-size:24px;line-height:1.7">●</span>2.1 M samples</div>
+        <div style="display:flex;gap:20px;font-size:34px"><span style="color:#004E9E;font-size:24px;line-height:1.7">●</span>3 dropout events</div>
+        <div style="font-size:34px;margin-top:18px;line-height:1.35">Adaptive scheduling kept coverage above 92 % throughout.</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:space-between;color:#6E7781;font-size:24px;padding:0 106px 26px"><span>ICSE Workshop, Mainz</span><span>A. Musterfrau</span><span>9</span></div>
+  </section>
+
+  <section data-label="Full-bleed figure" data-screen-label="10" data-speaker-notes="\thbfullfigure: image fills the slide, caption strip at the bottom." style="background:#EEF3F8;font-family:'Source Sans 3',Helvetica,Arial,sans-serif;display:flex;flex-direction:column;justify-content:flex-end">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:30px;color:#6E7781;background:repeating-linear-gradient(135deg,#EEF3F8 0 22px,#E4EBF2 22px 44px)">full-bleed figure</div>
+    <div style="position:relative;background:#1B1E23;color:#fff;font-size:28px;padding:22px 106px">Deployment area, 11 weeks of continuous operation. Nodes in green were rescheduled at least once.</div>
+  </section>
+
+  <section data-label="Headline result" data-screen-label="11" data-speaker-notes="\thbnumber: one claim, nothing else." style="background:#fff;font-family:'Source Sans 3',Helvetica,Arial,sans-serif;color:#1B1E23;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:flex-end;gap:12px;padding:26px 106px 0"><span style="width:14px;height:14px;background:#D8DEE5"></span><span style="width:14px;height:14px;background:#D8DEE5"></span><span style="width:14px;height:14px;background:#004E9E"></span></div>
+    <div style="padding:22px 106px 0"><div style="font-size:58px;font-weight:700;letter-spacing:-0.01em">Headline result</div><div style="width:56px;height:6px;background:#78B833;margin-top:16px"></div></div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 106px 60px">
+      <div style="color:#004E9E;font-size:200px;font-weight:700;line-height:0.9;letter-spacing:-0.03em">39 %</div>
+      <div style="width:62px;height:6px;background:#78B833;margin-top:38px"></div>
+      <div style="font-size:40px;margin-top:32px;text-align:center;max-width:1100px">lower reconstruction error than fixed-rate sampling at the same energy budget</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;color:#6E7781;font-size:24px;padding:0 106px 26px"><span>ICSE Workshop, Mainz</span><span>A. Musterfrau</span><span>10</span></div>
+  </section>
+
+  <section data-label="Table" data-screen-label="09" data-speaker-notes="booktabs table with \thbhead headers." style="background:#fff;font-family:'Source Sans 3',Helvetica,Arial,sans-serif;color:#1B1E23;display:flex;flex-direction:column">
+    <div style="display:flex;justify-content:flex-end;gap:12px;padding:26px 106px 0">
+      <span style="width:14px;height:14px;background:#D8DEE5"></span>
+      <span style="width:14px;height:14px;background:#D8DEE5"></span>
+      <span style="width:14px;height:14px;background:#004E9E"></span>
+    </div>
+    <div style="padding:22px 106px 0">
+      <div style="font-size:58px;font-weight:700;letter-spacing:-0.01em">Comparison</div>
+      <div style="width:56px;height:6px;background:#78B833;margin-top:16px"></div>
+    </div>
+    <div style="flex:1;padding:56px 106px 0;display:flex;flex-direction:column;align-items:center">
+      <table style="border-collapse:collapse;font-size:34px;min-width:1100px">
+        <thead>
+          <tr style="border-top:3px solid #1B1E23;border-bottom:1.5px solid #1B1E23">
+            <th style="text-align:left;padding:18px 28px;color:#004E9E">Method</th>
+            <th style="text-align:right;padding:18px 28px;color:#004E9E">RMSE</th>
+            <th style="text-align:right;padding:18px 28px;color:#004E9E">Energy</th>
+            <th style="text-align:right;padding:18px 28px;color:#004E9E">Uptime</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td style="padding:14px 28px">Fixed rate</td><td style="text-align:right;padding:14px 28px">0.72</td><td style="text-align:right;padding:14px 28px">3.0</td><td style="text-align:right;padding:14px 28px">88 %</td></tr>
+          <tr><td style="padding:14px 28px">Round robin</td><td style="text-align:right;padding:14px 28px">0.58</td><td style="text-align:right;padding:14px 28px">3.0</td><td style="text-align:right;padding:14px 28px">90 %</td></tr>
+          <tr style="border-bottom:3px solid #1B1E23"><td style="padding:14px 28px">Adaptive (ours)</td><td style="text-align:right;padding:14px 28px;font-weight:700">0.44</td><td style="text-align:right;padding:14px 28px">3.0</td><td style="text-align:right;padding:14px 28px;font-weight:700">92 %</td></tr>
+        </tbody>
+      </table>
+      <div style="color:#6E7781;font-size:28px;margin-top:28px">Averaged over 11 weeks; lower is better.</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;color:#6E7781;font-size:24px;padding:0 106px 26px"><span>ICSE Workshop, Mainz</span><span>A. Musterfrau</span><span>11</span></div>
+  </section>
+
+  <section data-label="Closing" data-screen-label="12" data-speaker-notes="closing environment: recap stays on screen through Q&A." style="background:#004E9E;font-family:'Source Sans 3',Helvetica,Arial,sans-serif;display:flex;flex-direction:column;justify-content:center;padding:0 106px">
+    <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:110px;align-items:center">
+      <div>
+        <div style="width:70px;height:7px;background:#78B833"></div>
+        <div style="color:#fff;font-size:74px;font-weight:700;margin-top:26px;letter-spacing:-0.015em">Questions?</div>
+        <div style="color:#EEF3F8;font-size:30px;margin-top:34px">A. Musterfrau · Technische Hochschule Bingen</div>
+        <div style="color:#EEF3F8;font-size:30px;margin-top:10px">a.musterfrau@th-bingen.de · doi.org/10.0000/xyz</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:22px">
+        <div style="color:#78B833;font-size:24px;font-weight:700;letter-spacing:0.08em">TAKEAWAYS</div>
+        <div style="display:flex;gap:20px;color:#fff;font-size:32px;line-height:1.35"><span style="color:#78B833;font-size:22px;line-height:1.8">●</span>Sampling should follow field variance, not the clock.</div>
+        <div style="display:flex;gap:20px;color:#fff;font-size:32px;line-height:1.35"><span style="color:#78B833;font-size:22px;line-height:1.8">●</span>39 % lower error at an unchanged energy budget.</div>
+        <div style="display:flex;gap:20px;color:#fff;font-size:32px;line-height:1.35"><span style="color:#78B833;font-size:22px;line-height:1.8">●</span>Code and the 11-week dataset are public.</div>
+      </div>
+    </div>
+  </section>
+
+</x-import>
+</x-dc>
+</body>
+</html>
