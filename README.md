@@ -3,6 +3,8 @@
 pdfLaTeX, 16:9, one `.sty` file. Drop `thbtalk.sty` next to your `.tex` file (or into
 `~/texmf/tex/latex/thbtalk/`) and compile `demo.tex` twice.
 
+**See it first:** [`demo.pdf`](demo.pdf) is the demo talk, built from `demo.tex`.
+
 The look follows the design in `design/thbtalk-preview.html` (open it in a browser). The
 package sets its own type scale from that design: body text is 8 pt, whatever size option
 you give `\documentclass`, and `\small`, `\large` etc. follow the design's steps.
@@ -154,6 +156,13 @@ LaTeX 2020-10 or newer, `beamer`, `kvoptions`, `etoolbox`, `ifthen`, `xcolor`, `
 
 ## Changing the package
 
+`demo.pdf` is committed so the demo can be seen without compiling. Whenever `demo.tex` or
+`thbtalk.sty` change, rebuild it and commit it with them:
+
+```sh
+python3 test/build_demo.py       # writes demo.pdf (with a fixed date, so it only changes with its sources)
+```
+
 `test/coverage.tex` uses every command and option. After editing `thbtalk.sty`, run
 
 ```sh
@@ -164,8 +173,10 @@ It compiles the coverage document in four variants with both versions, renders e
 compares them pixel by pixel. It uses the reference's own `coverage.tex`, so the comparison
 covers everything both versions have; if you added a command to `test/coverage.tex`, the new
 version is compiled as well, since a new command has nothing to look like yet but must compile.
-Exit code 0 means nothing looks different and everything compiles; otherwise the problems are
-listed, and differing pages are marked red in `test/build/<variant>/diff-page-NN.png`. Needs `pdflatex`,
+It also rebuilds the demo and reports a `demo.pdf` that no longer matches its sources.
+Exit code 0 means nothing looks different, everything compiles and `demo.pdf` is current;
+otherwise the problems are listed, and differing pages are marked red in
+`test/build/<variant>/diff-page-NN.png` (or `test/build/demo-check/` for the demo). Needs `pdflatex`,
 `pdftocairo` (poppler-utils) and Python with Pillow. When you add a command, add it to
 `test/coverage.tex` as well.
 

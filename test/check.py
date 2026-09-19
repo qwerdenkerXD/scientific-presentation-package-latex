@@ -12,9 +12,11 @@ they must compile.
     python3 test/check.py 553a06b      # reference = any git revision
     python3 test/check.py old.sty      # reference = a file (tested with the working-tree coverage.tex)
 
-A revision without test files uses the working-tree ones. Exit code 0 means every page of
-every variant is identical and everything compiles. For each page that differs, a diff
-image (changed pixels in red) is written to test/build/<variant>/.
+A revision without test files uses the working-tree ones. Finally it rebuilds the demo and
+checks that the committed demo.pdf still matches demo.tex and thbtalk.sty (if not, run
+python3 test/build_demo.py). Exit code 0 means every page of every variant is identical,
+everything compiles and demo.pdf is current. For each page that differs, a diff image
+(changed pixels in red) is written to test/build/<variant>/ or test/build/demo-check/.
 Needs pdflatex, pdftocairo (poppler-utils) and Pillow.
 """
 import shutil
@@ -25,19 +27,14 @@ from pathlib import Path
 
 from PIL import Image, ImageChops
 
+from build_demo import CompileError, build_demo, run_pdflatex
+
 TEST_DIR = Path(__file__).resolve().parent
 REPO_DIR = TEST_DIR.parent
 BUILD_DIR = TEST_DIR / "build"
 TEST_FILES = ["coverage.tex", "logo.png", "photo.png"]
 VARIANTS = ["default", "german", "bare", "notes"]
 RENDER_DPI = 150
-# pdflatex stays far below this; the cap only guards the WSL VM against runaways.
-MEMORY_CAP = ["systemd-run", "--user", "--scope", "-q",
-              "-p", "MemoryMax=1G", "-p", "MemorySwapMax=0"]
-
-
-class CompileError(Exception):
-    pass
 
 
 def committed_file(revision, path):
@@ -68,24 +65,21 @@ def reference_inputs(reference):
     return {"thbtalk.sty": package, **test_files}, f"{reference}'s"
 
 
-def compile_and_render(work_dir, variant, render):
-    """Compile coverage.tex twice in work_dir; with render, return its pages as images."""
-    command = MEMORY_CAP + ["pdflatex", "-interaction=nonstopmode", "-halt-on-error",
-                            rf"\def\variant{{{variant}}}\input{{coverage}}"]
-    for _ in range(2):  # second run picks up the outline, navigation and page references
-        run = subprocess.run(command, cwd=work_dir, capture_output=True)
-        if run.returncode != 0:
-            log_lines = (work_dir / "coverage.log").read_text(errors="replace").splitlines()
-            first_error = next((i for i, line in enumerate(log_lines) if line.startswith("!")), None)
-            excerpt = log_lines[first_error:first_error + 3] if first_error is not None else log_lines[-5:]
-            raise CompileError("\n           ".join(excerpt))
-    if not render:
-        return []
+def render_pages(pdf, output_dir, prefix):
+    """Render every page of pdf to <output_dir>/<prefix>-NN.png; returns them in order."""
+    for old_page in output_dir.glob(f"{prefix}-*.png"):
+        old_page.unlink()
     # pdftocairo, not pdftoppm: pdftoppm snaps rule edges to whole pixels and misses
     # sub-pixel changes; cairo renders edges with fractional coverage.
-    subprocess.run(["pdftocairo", "-png", "-r", str(RENDER_DPI), "coverage.pdf", "page"],
-                   cwd=work_dir, check=True)
-    return sorted(work_dir.glob("page-*.png"))
+    subprocess.run(["pdftocairo", "-png", "-r", str(RENDER_DPI), str(pdf), prefix],
+                   cwd=output_dir, check=True)
+    return sorted(output_dir.glob(f"{prefix}-*.png"))
+
+
+def compile_and_render(work_dir, variant, render):
+    """Compile coverage.tex in work_dir; with render, return its pages as images."""
+    pdf = run_pdflatex(work_dir, "coverage", rf"\def\variant{{{variant}}}\input{{coverage}}")
+    return render_pages(pdf, work_dir, "page") if render else []
 
 
 def build(variant, side, files, render=True):
@@ -98,7 +92,10 @@ def build(variant, side, files, render=True):
     return compile_and_render(work_dir, variant, render)
 
 
-def compare_pages(variant, reference_pages, current_pages):
+def compare_pages(diff_dir, reference_pages, current_pages):
+    """Problems found comparing two lists of page images; marks changed pixels in diff_dir."""
+    for stale_diff in diff_dir.glob("diff-page-*.png"):
+        stale_diff.unlink()
     problems = []
     if len(reference_pages) != len(current_pages):
         problems.append(f"page count {len(reference_pages)} -> {len(current_pages)}")
@@ -116,15 +113,13 @@ def compare_pages(variant, reference_pages, current_pages):
             changed_mask = difference.convert("L").point(lambda value: 255 if value else 0)
             highlighted = new.convert("RGB")
             highlighted.paste((255, 0, 0), mask=changed_mask)
-            highlighted.save(BUILD_DIR / variant / f"diff-page-{page_number:02d}.png")
+            highlighted.save(diff_dir / f"diff-page-{page_number:02d}.png")
     return problems
 
 
 def check_variant(variant, reference_files, tests_source, current_files):
     """Returns (page count, list of problems) for one variant."""
     (BUILD_DIR / variant).mkdir(parents=True, exist_ok=True)
-    for stale_diff in (BUILD_DIR / variant).glob("diff-page-*.png"):
-        stale_diff.unlink()
     test_files = {name: reference_files[name] for name in TEST_FILES}
     try:
         reference_pages = build(variant, "reference", reference_files)
@@ -134,7 +129,7 @@ def check_variant(variant, reference_files, tests_source, current_files):
         current_pages = build(variant, "current", {**test_files, "thbtalk.sty": current_files["thbtalk.sty"]})
     except CompileError as error:
         return 0, [f"the working-tree package does not compile {tests_source} coverage.tex:\n           {error}"]
-    problems = compare_pages(variant, reference_pages, current_pages)
+    problems = compare_pages(BUILD_DIR / variant, reference_pages, current_pages)
     if any(current_files[name] != test_files[name] for name in TEST_FILES):
         try:
             build(variant, "current-new-tests", current_files, render=False)
@@ -143,14 +138,31 @@ def check_variant(variant, reference_files, tests_source, current_files):
     return len(current_pages), problems
 
 
+def check_demo():
+    """Problems of the committed demo.pdf: it must match a fresh build of its sources."""
+    check_dir = BUILD_DIR / "demo-check"
+    try:
+        fresh_pdf = build_demo(check_dir)
+    except CompileError as error:
+        return [f"demo.tex does not compile:\n           {error}"]
+    committed_pdf = REPO_DIR / "demo.pdf"
+    if not committed_pdf.exists():
+        return ["there is no demo.pdf"]
+    problems = compare_pages(check_dir, render_pages(committed_pdf, check_dir, "committed"),
+                             render_pages(fresh_pdf, check_dir, "fresh"))
+    return problems and problems + ["demo.pdf is out of date: run python3 test/build_demo.py"]
+
+
 def main():
     reference = sys.argv[1] if len(sys.argv) > 1 else "HEAD"
     reference_files, tests_source = reference_inputs(reference)
     current_files = working_tree_inputs()
     tests_changed = any(current_files[name] != reference_files[name] for name in TEST_FILES)
-    with ThreadPoolExecutor(max_workers=len(VARIANTS)) as pool:
+    with ThreadPoolExecutor(max_workers=len(VARIANTS) + 1) as pool:
+        demo_check = pool.submit(check_demo)
         results = dict(zip(VARIANTS, pool.map(
             lambda variant: check_variant(variant, reference_files, tests_source, current_files), VARIANTS)))
+        demo_problems = demo_check.result()
     all_good = True
     for variant, (page_count, problems) in results.items():
         verdict = "identical" if not problems else "NOT OK"
@@ -162,7 +174,10 @@ def main():
         print("The working-tree test files differ from the reference's: compared on the reference's,"
               "\nand the new ones compiled with the working-tree package"
               + (" without errors." if all_good else "."))
-    return 0 if all_good else 1
+    print("demo.pdf matches demo.tex and thbtalk.sty" if not demo_problems else "demo.pdf NOT OK")
+    for problem in demo_problems:
+        print(f"         {problem}")
+    return 0 if all_good and not demo_problems else 1
 
 
 if __name__ == "__main__":

@@ -7,8 +7,10 @@
 !/README.md
 !/thbtalk.sty
 !/demo.tex
+!/demo.pdf
 
 !/test/
+!/test/build_demo.py
 !/test/check.py
 !/test/coverage.tex
 !/test/logo.png
