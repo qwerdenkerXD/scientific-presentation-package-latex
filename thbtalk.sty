@@ -273,6 +273,15 @@
 \newcommand{\thb@definelabelkey}[1]{\define@key{thb@label}{#1}{\@namedef{thbname@#1}{##1}}}
 \@for\thb@label:=\thb@labels\do{\expandafter\thb@definelabelkey\expandafter{\thb@label}}
 
+% \thblabel{<label>}: the text of a label in the current language, for use in slides, e.g.
+%   \begin{frame}{\thblabel{refs}}   or   \thbclosingframe[\thblabel{thanks}]
+\DeclareRobustCommand{\thblabel}[1]{%
+  \ifcsname thbname@#1\endcsname
+    \csname thbname@#1\endcsname
+  \else
+    \PackageError{thbtalk}{Unknown label `#1'}{The labels are: \thb@labels.}%
+  \fi}
+
 \newcommand{\thbdeclarelang}[2]{\@namedef{thb@lang@#1}{\setkeys{thb@label}{#2}}}
 \newcommand{\thbsetlang}[1]{\thb@lang@en\thb@choose{lang}{#1}}
 

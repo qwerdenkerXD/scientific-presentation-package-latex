@@ -97,6 +97,15 @@ def schedule(nodes, budget):
   \end{twocols}
 \end{frame}
 
+% Built-in labels follow the language: \thblabel{figure} is "Fig." in English, "Abb." in German
+\begin{frame}{Deployment area}
+  \thbplaceholder[0.8]{5.2cm}{deployment map}
+  \vspace{0.6em}
+  {\centering\small\color{thbmuted}
+    \thblabel{figure}~1: Eighteen nodes along 11\,km of the Upper Rhine; green nodes
+    were rescheduled at least once.\par}
+\end{frame}
+
 \begin{frame}{Error versus energy budget}
   \begin{center}
     \begin{tikzpicture}
@@ -137,7 +146,7 @@ def schedule(nodes, budget):
   {\small\color{thbmuted} Averaged over 11 weeks; lower is better.}
 \end{frame}
 
-\begin{frame}{References}
+\begin{frame}{\thblabel{refs}}
   \begin{thebibliography}{9}
     \bibitem{krause08} A.~Krause and C.~Guestrin.
       \emph{Near-optimal sensor placements}. JMLR, 2008.
@@ -145,6 +154,8 @@ def schedule(nodes, budget):
       \emph{Energy-aware scheduling in environmental networks}. Sensors, 2021.
   \end{thebibliography}
 \end{frame}
+
+\thbclosingframe[\thblabel{thanks}]
 
 \begin{closing}
   \item Sampling should follow field variance, not the clock.

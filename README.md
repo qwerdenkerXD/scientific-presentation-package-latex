@@ -51,7 +51,14 @@ you leave out keep their English text:
 ```
 
 The labels are `outline`, `takeaway`, `refs`, `backup`, `thanks`, `questions`, `figure`,
-`recap` and `where`.
+`recap` and `where`. `\thblabel{<label>}` prints one in the current language, so your own
+slides switch language with the package's:
+
+```latex
+\begin{frame}{\thblabel{refs}} ... \end{frame}         % References / Literatur
+\thbclosingframe[\thblabel{thanks}]                    % Thank you / Vielen Dank
+\thblabel{figure}~1: Deployment area                    % Fig. 1 / Abb. 1
+```
 
 ## Structure commands
 
