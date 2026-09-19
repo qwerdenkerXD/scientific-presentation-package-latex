@@ -154,6 +154,21 @@ LaTeX 2020-10 or newer, `beamer`, `kvoptions`, `etoolbox`, `ifthen`, `xcolor`, `
 `tcolorbox`, and for the fonts `lmodern`, `sourcesanspro`, `sourceserifpro`, `sourcecodepro`,
 `mathastext` — all in a standard TeX Live / MiKTeX / Overleaf installation.
 
+## Repository layout
+
+| Path | What it is |
+|---|---|
+| `thbtalk.sty` | the package — the only file a talk needs |
+| `demo.tex`, `demo.pdf` | example talk; the PDF is rebuilt with `test/build_demo.py` |
+| `design/thbtalk-preview.html` | the design the package follows (open in a browser; the `.js` files are its viewer) |
+| `test/coverage.tex` | uses every command and option, in four variants |
+| `test/check.py` | pixel comparison against a reference version, and the `demo.pdf` check |
+| `test/design.tex`, `test/design_check.py` | the design's slides in LaTeX, and the comparison with the design |
+| `test/build_demo.py` | builds `demo.pdf` |
+| `test/build/` | build output of the scripts, not tracked |
+
+`.gitignore` is a whitelist: a new file is only tracked after a `!/path` line is added for it.
+
 ## Changing the package
 
 `demo.pdf` is committed so the demo can be seen without compiling. Whenever `demo.tex` or
