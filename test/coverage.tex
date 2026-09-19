@@ -1,0 +1,198 @@
+% coverage.tex -- uses every command, environment and option of thbtalk.sty once.
+% test/check.py compiles it once per variant and compares the rendered pages against a
+% reference version of the package. Select a variant by hand with
+%   pdflatex '\def\variant{german}\input{coverage}'
+\ifdefined\variant\else\def\variant{default}\fi
+\def\isvariant#1{\def\variantname{#1}\ifx\variant\variantname}
+
+\isvariant{german}\PassOptionsToPackage{lang=de,font=helvet,nodots,nonumbers}{thbtalk}\fi
+\isvariant{bare}\PassOptionsToPackage{nofooter,nosectionslides,font=none}{thbtalk}\fi
+\isvariant{notes}\PassOptionsToPackage{notes=second}{thbtalk}\fi
+
+\documentclass[aspectratio=169,10pt]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{thbtalk}
+
+\title{Coverage of every thbtalk feature}
+\author{A.~Tester}
+\institute{Test Institute}
+\date{19 September 2026}   % fixed, so the pages do not change from day to day
+
+% "bare" leaves all optional title-page data empty; "german" uses an image logo.
+% (\isvariant is not a conditional itself, so it cannot be nested in a skipped branch.)
+\newcommand\titlepagedata{%
+  \subtitle{Optional subtitle line}%
+  \thbvenue{Test Venue, Mainz}%
+  \thbcontact{a.tester@example.org \textperiodcentered\ doi.org/10.0000/test}}
+\isvariant{default}\titlepagedata\thblogotext{TH Bingen}\fi
+\isvariant{notes}\titlepagedata\thblogotext{TH Bingen}\fi
+\isvariant{german}\titlepagedata\thblogo{logo.png}\fi
+
+\thboutlinenote{1}{Gloss under the first section}
+\thboutlinenote{2}{Gloss under the second section}
+% section 3 and 4 deliberately have no gloss
+
+% a declared language that leaves most labels at their English text
+\thbdeclarelang{fr}{outline=Plan, where=O\`u nous en sommes}
+
+\begin{document}
+
+\thbtitleframe
+\thboutline
+\thboutline[2]
+\thboutlinecompact
+\thboutlinecompact[2]
+
+\section{Blocks and text}
+\subsection{Lists}
+
+\begin{frame}{Lists and overlays}{With a frame subtitle}
+  \begin{itemize}
+    \item First item with \alert{alerted text}
+      \begin{itemize}\item Sub item\end{itemize}
+    \pause
+    \item Second item, uncovered on the next page
+  \end{itemize}
+  \begin{enumerate}
+    \item Numbered
+    \item List
+  \end{enumerate}
+  \note{A speaker note, visible in the notes variant.}
+\end{frame}
+
+\subsection{Blocks}
+
+\begin{frame}{Blocks}
+  \begin{block}{Block}Plain block.\end{block}
+  \begin{alertblock}{Alert block}Alerted block.\end{alertblock}
+  \begin{exampleblock}{Example block}Example block.\end{exampleblock}
+  \begin{takeaway}Default takeaway heading.\end{takeaway}
+  \begin{takeaway}[Custom]Custom takeaway heading.\end{takeaway}
+\end{frame}
+
+\subsection{Maths}
+
+\begin{frame}{Maths}
+  \begin{keyeq}
+    \begin{equation}
+      \min_{\pi}\; \mathbb{E}\!\left[\lVert x - \hat{x}_{\pi}\rVert_2^2\right]
+    \end{equation}
+  \end{keyeq}
+  \begin{theorem}[With addition]Theorem text.\end{theorem}
+  \begin{lemma}Lemma without addition.\end{lemma}
+\end{frame}
+
+\begin{frame}{More maths}
+  \begin{definition}Definition text.\end{definition}
+  \begin{proof}Proof text.\end{proof}
+\end{frame}
+
+\thbagenda
+\thbagenda[Custom agenda title]
+
+\section{Figures and code}
+
+\begin{frame}{Headline number and quote}
+  \thbnumber{39\,\%}{lower error at the same energy budget}
+  \thbquote{A cited statement in italics.}{Source, 2008}
+\end{frame}
+
+\begin{frame}{Two columns, default width}
+  \begin{twocols}
+    \thbplaceholder[1.0]{3cm}{placeholder}
+    \colbreak
+    \begin{itemize}\item Right column\end{itemize}
+  \end{twocols}
+\end{frame}
+
+\begin{frame}{Two columns, custom width}
+  \begin{twocols}[0.4]
+    \thbfigure[0.9]{photo.png}{Figure caption below.}
+    \colbreak
+    \thbplaceholder{2cm}{default placeholder width}
+  \end{twocols}
+\end{frame}
+
+\begin{frame}{Figure environment}
+  \begin{figure}
+    \includegraphics[width=0.4\textwidth]{photo.png}
+    \caption{A beamer caption.}
+  \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Code}
+  \begin{code}[language=Python]
+def schedule(nodes, budget):
+    return [n for n in nodes if n.cost < budget]   # comment
+  \end{code}
+\end{frame}
+
+\begin{frame}{Pseudocode}
+  \begin{pseudocode}{Scheduler}
+    \State $S \gets \emptyset$
+    \While{$|S| < k$}
+      \State $S \gets S \cup \{v\}$
+    \EndWhile
+  \end{pseudocode}
+\end{frame}
+
+\begin{frame}{Plot}
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[thbplot,xlabel={x},ylabel={y}]
+        \addplot coordinates {(1,1)(2,3)(3,2)};
+        \addplot coordinates {(1,2)(2,1)(3,3)};
+        \addplot coordinates {(1,3)(2,2)(3,1)};
+      \end{axis}
+    \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Table}
+  \begin{tabular}{lr}
+    \toprule
+    \thbhead{Method} & \thbhead{RMSE} \\
+    \midrule
+    Fixed & 0.72 \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+
+\thbfullfigure{photo.png}{Caption strip along the bottom of a full-bleed figure.}
+
+\section{Closing}
+
+\begin{frame}{References}
+  \begin{thebibliography}{9}
+    \bibitem{a} A.~Author. \emph{A title}. Journal, 2008.
+  \end{thebibliography}
+\end{frame}
+
+\thbclosingframe
+\thbclosingframe[Custom closing text]
+
+\begin{closing}
+  \item First recap point.
+  \item Second recap point.
+\end{closing}
+
+\begin{closing}[Discussion]
+  \item Recap with a custom title.
+\end{closing}
+
+\section{Runtime language switch}
+\thbsetlang{de}
+\thbagenda
+\thboutlinecompact
+\thbsetlang{fr}
+\thbagenda
+\thbclosingframe
+\thbsetlang{en}
+
+\thbbackup
+\begin{frame}{Backup slide}
+  Content after the \thbcmd{thbbackup} divider, in a frame that is not fragile.
+\end{frame}
+
+\end{document}

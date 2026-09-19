@@ -1,0 +1,15 @@
+# Whitelist: everything is ignored except the files listed below.
+# A new file only gets tracked after adding a "!" line for it here.
+*
+
+!/.gitignore
+!/LICENSE
+!/README.md
+!/thbtalk.sty
+!/demo.tex
+
+!/test/
+!/test/check.py
+!/test/coverage.tex
+!/test/logo.png
+!/test/photo.png

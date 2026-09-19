@@ -3,9 +3,12 @@
 %% Usage:  \documentclass[aspectratio=169]{beamer}
 %%         \usepackage[lang=en]{thbtalk}
 %%
-%% Options (key=value):
-%%   lang=en|de          built-in labels (default: en); runtime: \thbsetlang{de}
+%% Options (key=value; an unknown value is an error):
+%%   lang=en|de          built-in labels (default: en); runtime: \thbsetlang{de};
+%%                       add a language with \thbdeclarelang (see "languages" below)
 %%   font=lmodern|helvet|none
+%%   notes=none|second|only
+%%                       speaker notes: off, on a second screen, or a notes-only PDF
 %%   nodots              hide the section navigation dots
 %%   nofooter            hide the footer line
 %%   nonumbers           hide slide numbers
@@ -14,9 +17,12 @@
 %% Colours: redefine after loading, e.g.
 %%   \definecolor{thbprimary}{HTML}{004E9E}
 %%   \definecolor{thbaccent}{HTML}{78B833}
+%%
+%% All commands are described in README.md. After changing this file, run
+%% python3 test/check.py: it verifies that no slide looks different.
 
-\NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{thbtalk}[2026/09/19 v1.0 Scientific talk theme for beamer]
+\NeedsTeXFormat{LaTeX2e}[2020/10/01]   % for \NewDocumentEnvironment with a +b argument
+\ProvidesPackage{thbtalk}[2026/09/19 v1.1 Scientific talk theme for beamer]
 
 \RequirePackage{kvoptions}
 \SetupKeyvalOptions{family=thb,prefix=thb@}
@@ -29,6 +35,7 @@
 \DeclareStringOption[none]{notes}
 \ProcessKeyvalOptions*
 
+\RequirePackage{keyval}
 \RequirePackage{ifthen}
 \RequirePackage{xcolor}
 \RequirePackage{graphicx}
@@ -42,14 +49,29 @@
 \RequirePackage{algpseudocode}
 \RequirePackage{mdframed}
 
-\ifthenelse{\equal{\thb@notes}{second}}{\setbeameroption{show notes on second screen=right}}{}
-\ifthenelse{\equal{\thb@notes}{only}}{\setbeameroption{show only notes}}{}
+% ---------------------------------------------------------- choice values ---
+% Each value of a choice (notes=, font=, lang=) is one macro \thb@<choice>@<value>.
+% \thb@choose runs it. A value without a macro is a typo and stops with an error,
+% instead of silently falling back to a default.
+\newcommand{\thb@choose}[2]{%
+  \ifcsname thb@#1@#2\endcsname
+    \csname thb@#1@#2\endcsname
+  \else
+    \PackageError{thbtalk}{Unknown #1 `#2'}%
+      {The known values are listed at the top of thbtalk.sty.}%
+  \fi}
 
-\ifthenelse{\equal{\thb@font}{helvet}}{%
+\@namedef{thb@notes@none}{}
+\@namedef{thb@notes@second}{\setbeameroption{show notes on second screen=right}}
+\@namedef{thb@notes@only}{\setbeameroption{show only notes}}
+\thb@choose{notes}{\thb@notes}
+
+\@namedef{thb@font@none}{}
+\@namedef{thb@font@helvet}{%
   \RequirePackage[T1]{fontenc}\RequirePackage{helvet}%
-  \renewcommand{\familydefault}{\sfdefault}}{}
-\ifthenelse{\equal{\thb@font}{lmodern}}{%
-  \RequirePackage[T1]{fontenc}\RequirePackage{lmodern}}{}
+  \renewcommand{\familydefault}{\sfdefault}}
+\@namedef{thb@font@lmodern}{\RequirePackage[T1]{fontenc}\RequirePackage{lmodern}}
+\thb@choose{font}{\thb@font}
 
 % ---------------------------------------------------------------- palette ---
 % TH Bingen house colours. Swap these two lines for any other institution.
@@ -111,28 +133,24 @@
 \setbeamertemplate{blocks}[rounded][shadow=false]
 
 % ------------------------------------------------------------- languages ---
-\newcommand{\thbsetlang}[1]{%
-  \ifthenelse{\equal{#1}{de}}{%
-    \def\thbname@outline{Gliederung}%
-    \def\thbname@takeaway{Kernaussage}%
-    \def\thbname@refs{Literatur}%
-    \def\thbname@backup{Anhang}%
-    \def\thbname@thanks{Vielen Dank}%
-    \def\thbname@questions{Fragen?}%
-    \def\thbname@figure{Abb.}%
-    \def\thbname@recap{Zum Mitnehmen}%
-    \def\thbname@where{Wo wir stehen}%
-  }{%
-    \def\thbname@outline{Outline}%
-    \def\thbname@takeaway{Takeaway}%
-    \def\thbname@refs{References}%
-    \def\thbname@backup{Backup}%
-    \def\thbname@thanks{Thank you}%
-    \def\thbname@questions{Questions?}%
-    \def\thbname@figure{Fig.}%
-    \def\thbname@recap{Takeaways}%
-    \def\thbname@where{Where we are}%
-  }}
+% Every label the package prints is \thbname@<label>. A language sets them by key:
+%   \thbdeclarelang{fr}{outline=Plan, questions=Questions~?, ...}
+%   \thbsetlang{fr}
+% Labels a language leaves out keep their English text. An unknown label is an error.
+\newcommand{\thb@labels}{outline,takeaway,refs,backup,thanks,questions,figure,recap,where}
+\newcommand{\thb@definelabelkey}[1]{\define@key{thb@label}{#1}{\@namedef{thbname@#1}{##1}}}
+\@for\thb@label:=\thb@labels\do{\expandafter\thb@definelabelkey\expandafter{\thb@label}}
+
+\newcommand{\thbdeclarelang}[2]{\@namedef{thb@lang@#1}{\setkeys{thb@label}{#2}}}
+\newcommand{\thbsetlang}[1]{\thb@lang@en\thb@choose{lang}{#1}}
+
+\thbdeclarelang{en}{%
+  outline=Outline, takeaway=Takeaway, refs=References, backup=Backup, thanks=Thank you,
+  questions=Questions?, figure=Fig., recap=Takeaways, where=Where we are}
+\thbdeclarelang{de}{%
+  outline=Gliederung, takeaway=Kernaussage, refs=Literatur, backup=Anhang,
+  thanks=Vielen Dank, questions=Fragen?, figure=Abb., recap=Zum Mitnehmen,
+  where=Wo wir stehen}
 \thbsetlang{\thb@lang}
 
 % ------------------------------------------------------- title-page data ---
@@ -153,6 +171,31 @@
   \else
     \includegraphics[height=0.085\paperheight]{\thb@logofile}%
   \fi}
+
+% -------------------------------------------------------- building blocks ---
+% The short green bar above slide titles, and its smaller twin under frame titles
+\newcommand{\thb@accentbar}{{\color{thbaccent}\rule{2.6em}{2.5pt}}}
+\newcommand{\thb@accentbar@small}{{\color{thbaccent}\rule{2.2em}{2pt}}}
+
+% "Author · Institute" and the optional contact line on the closing slides.
+% #1: space above the contact line
+\newcommand{\thb@signature}[1]{%
+  {\color{thbtint}\small\insertauthor\ \textbf{\textperiodcentered}\ \insertinstitute\par}
+  \ifx\thb@contact\empty\else
+    \vspace{#1}{\color{thbtint}\small\thb@contact\par}\fi}
+
+% Slides the package builds itself use beamer's command form \frame[<options>]{<body>},
+% which is what \begin{frame}...\end{frame} turns into anyway. The body is an ordinary
+% argument, so it may contain any conditional or environment. Written as
+% \begin{frame}...\end{frame} inside a macro, beamer has to find \end{frame} by scanning,
+% which breaks when an \if...\fi spans an \end{...} or when an environment splits the
+% frame across its begin and end code.
+% A body that starts with {...} would be taken as the frame title, hence the \relax.
+
+% \thb@darkslide{<body>}: slide in the primary colour, no header or footer, not numbered
+\newcommand{\thb@darkslide}[1]{%
+  {\setbeamercolor{background canvas}{bg=thbprimary}%
+   \frame[plain,noframenumbering]{\relax#1}}}
 
 % ------------------------------------------------------------- furniture ---
 \setbeamertemplate{section in head/foot}{%
@@ -185,7 +228,7 @@
 \setbeamertemplate{title page}{%
   \vspace*{-0.5em}\hfill\thb@logobox\par
   \vfill
-  {\color{thbaccent}\rule{2.6em}{2.5pt}}\par\vspace{0.9em}
+  \thb@accentbar\par\vspace{0.9em}
   {\usebeamerfont{title}\usebeamercolor[fg]{title}\inserttitle\par}
   \ifx\insertsubtitle\@empty\else
     \vspace{0.4em}{\usebeamerfont{subtitle}\usebeamercolor[fg]{subtitle}\insertsubtitle\par}\fi
@@ -198,27 +241,23 @@
     \ifx\thb@venue\empty\else\;\textbf{\textperiodcentered}\; \thb@venue\fi\par}
   \vfill}
 
-\newcommand{\thbtitleframe}{%
-  {\setbeamertemplate{headline}{}\setbeamertemplate{footline}{}%
-   \begin{frame}[plain,noframenumbering]\titlepage\end{frame}}}
+\newcommand{\thbtitleframe}{\frame[plain,noframenumbering]{\titlepage}}
 
 % ------------------------------------------------------- section slides ---
 \newcommand{\thb@twodigit}[1]{\ifnum#1<10 0\fi\number#1}
 \newcommand{\thb@sectionframe}{%
-  {\setbeamercolor{background canvas}{bg=thbprimary}%
-   \setbeamertemplate{headline}{}\setbeamertemplate{footline}{}%
-   \setbeamertemplate{section in toc}{%
+  {\setbeamertemplate{section in toc}{%
      \leavevmode{\color{white}\inserttocsection}\par\vspace{0.45em}}%
    \setbeamertemplate{section in toc shaded}[default][40]%
    \setbeamercolor{section in toc shaded}{fg=white}%
    \setbeamertemplate{subsection in toc}{}%
-   \begin{frame}[plain,noframenumbering]
+   \thb@darkslide{%
      \vfill
      \begin{columns}[T,onlytextwidth]
        \begin{column}{0.62\textwidth}
          {\color{thbaccent}\fontsize{60}{60}\selectfont\bfseries\thb@twodigit{\value{section}}}\par
          \vspace{0.45em}
-         {\color{thbaccent}\rule{2.6em}{2.5pt}}\par\vspace{0.7em}
+         \thb@accentbar\par\vspace{0.7em}
          {\color{white}\usebeamerfont{title}\insertsectionhead\par}
        \end{column}\hfill
        \begin{column}{0.32\textwidth}
@@ -226,11 +265,11 @@
          \tableofcontents[currentsection,hideallsubsections,sectionstyle=show/shaded]
        \end{column}
      \end{columns}
-     \vfill
-   \end{frame}}}
+     \vfill}}}
 \AtBeginSection[]{\ifthb@nosectionslides\else\thb@sectionframe\fi}
 
-\newcommand{\thboutlinenote}[2]{\expandafter\def\csname thb@note@#1\endcsname{#2}}
+% ----------------------------------------------------------- outline slide ---
+\newcommand{\thboutlinenote}[2]{\@namedef{thb@note@#1}{#2}}
 \newcommand{\thb@note}[1]{%
   \ifcsname thb@note@#1\endcsname\csname thb@note@#1\endcsname\fi}
 \newif\ifthb@tocnotes\thb@tocnotestrue
@@ -239,31 +278,23 @@
 % \thboutline            single column, all subsections
 % \thboutline[4]         two columns, break after section 4 (for long talks)
 % \thboutlinecompact     titles only: no glosses, no subsections, no rules
-\newcommand{\thboutline}[1][0]{%
-  \begin{frame}{\thbname@outline}
+\newcommand{\thboutline}[1][0]{\thb@outlineslide{#1}{}}
+\newcommand{\thboutlinecompact}[1][0]{%
+  {\thb@tocnotesfalse\thb@tocrulesfalse\thb@outlineslide{#1}{hideallsubsections}}}
+
+% \thb@outlineslide{<last section of the left column, 0 = one column>}{<\tableofcontents options>}
+\newcommand{\thb@outlineslide}[2]{%
+  \frame{\frametitle{\thbname@outline}
     \vspace{0.8em}
     \ifnum#1>0\relax
       \begin{columns}[T,onlytextwidth]
-        \begin{column}{0.46\textwidth}\tableofcontents[sections={1-#1}]\end{column}\hfill
-        \begin{column}{0.46\textwidth}\tableofcontents[sections={\the\numexpr#1+1\relax-}]\end{column}
+        \begin{column}{0.46\textwidth}\tableofcontents[sections={1-#1},#2]\end{column}\hfill
+        \begin{column}{0.46\textwidth}\tableofcontents[sections={\the\numexpr#1+1\relax-},#2]\end{column}
       \end{columns}
     \else
-      \tableofcontents
-    \fi
-  \end{frame}}
-\newcommand{\thboutlinecompact}[1][0]{%
-  {\thb@tocnotesfalse\thb@tocrulesfalse
-   \begin{frame}{\thbname@outline}
-     \vspace{0.8em}
-     \ifnum#1>0\relax
-       \begin{columns}[T,onlytextwidth]
-         \begin{column}{0.46\textwidth}\tableofcontents[sections={1-#1},hideallsubsections]\end{column}\hfill
-         \begin{column}{0.46\textwidth}\tableofcontents[sections={\the\numexpr#1+1\relax-},hideallsubsections]\end{column}
-       \end{columns}
-     \else
-       \tableofcontents[hideallsubsections]
-     \fi
-   \end{frame}}}
+      \tableofcontents[#2]
+    \fi}}
+
 \setbeamertemplate{section in toc}{%
   \leavevmode
   \begin{minipage}[t]{0.055\textwidth}%
@@ -286,54 +317,43 @@
   \leavevmode\hspace{0.055\textwidth}%
   {\color{thbmuted}\small\inserttocsubsection}\par\vspace{0.25em}}
 
+% Standalone progress slide, usable anywhere mid-talk
+\newcommand{\thbagenda}[1][\thbname@where]{%
+  \frame{\frametitle{#1}
+    \vspace{0.6em}
+    \tableofcontents[currentsection,hideallsubsections,sectionstyle=show/shaded]}}
+
+% --------------------------------------------------------- closing slides ---
 \newcommand{\thbclosingframe}[1][\thbname@questions]{%
-  {\setbeamercolor{background canvas}{bg=thbprimary}%
-   \setbeamertemplate{headline}{}\setbeamertemplate{footline}{}%
-   \begin{frame}[plain,noframenumbering]
-     \vfill
-     {\color{thbaccent}\rule{2.6em}{2.5pt}}\par\vspace{0.8em}
-     {\color{white}\usebeamerfont{title}#1\par}
-     \vspace{0.8em}
-     {\color{thbtint}\small\insertauthor\ \textbf{\textperiodcentered}\ \insertinstitute\par}
-     \ifx\thb@contact\empty\else
-       \vspace{0.4em}{\color{thbtint}\small\thb@contact\par}\fi
-     \vfill
-   \end{frame}}}
+  \thb@darkslide{%
+    \vfill
+    \thb@accentbar\par\vspace{0.8em}
+    {\color{white}\usebeamerfont{title}#1\par}
+    \vspace{0.8em}
+    \thb@signature{0.4em}
+    \vfill}}
 
 % Closing slide that keeps the recap on screen during Q&A:
 %   \begin{closing}[Questions?] \item ... \end{closing}
-\newenvironment{closing}[1][\thbname@questions]{%
-  \def\thb@closingtitle{#1}%
-  \setbeamercolor{background canvas}{bg=thbprimary}%
-  \setbeamertemplate{headline}{}\setbeamertemplate{footline}{}%
+% The +b argument collects the items, so the whole slide is built in one piece.
+\NewDocumentEnvironment{closing}{O{\thbname@questions} +b}{%
   \setbeamercolor{itemize item}{fg=thbaccent}%
   \setbeamercolor{normal text}{fg=white}\usebeamercolor[fg]{normal text}%
-  \begin{frame}[plain,noframenumbering]
+  \thb@darkslide{%
     \vfill
     \begin{columns}[T,onlytextwidth]
       \begin{column}{0.52\textwidth}
-        {\color{thbaccent}\rule{2.6em}{2.5pt}}\par\vspace{0.8em}
-        {\color{white}\usebeamerfont{title}\thb@closingtitle\par}
+        \thb@accentbar\par\vspace{0.8em}
+        {\color{white}\usebeamerfont{title}#1\par}
         \vspace{1.0em}
-        {\color{thbtint}\small\insertauthor\ \textbf{\textperiodcentered}\ \insertinstitute\par}
-        \ifx\thb@contact\empty\else
-          \vspace{0.35em}{\color{thbtint}\small\thb@contact\par}\fi
+        \thb@signature{0.35em}
       \end{column}\hfill
       \begin{column}{0.40\textwidth}
         {\color{thbaccent}\footnotesize\bfseries\MakeUppercase{\thbname@recap}\par}\vspace{0.6em}
-        \color{white}\begin{itemize}}%
- {       \end{itemize}
+        \color{white}\begin{itemize}#2\end{itemize}
       \end{column}
     \end{columns}
-    \vfill
-  \end{frame}}
-
-% Standalone progress slide, usable anywhere mid-talk
-\newcommand{\thbagenda}[1][\thbname@where]{%
-  \begin{frame}{#1}
-    \vspace{0.6em}
-    \tableofcontents[currentsection,hideallsubsections,sectionstyle=show/shaded]
-  \end{frame}}
+    \vfill}}{}
 
 % ------------------------------------------------------ frame title look ---
 \setbeamertemplate{frametitle}{%
@@ -343,7 +363,7 @@
     \ifx\insertframesubtitle\@empty\else
       \vspace{0.15em}{\usebeamerfont{framesubtitle}\usebeamercolor[fg]{framesubtitle}%
       \insertframesubtitle\par}\fi
-    \vspace{0.35em}{\color{thbaccent}\rule{2.2em}{2pt}}%
+    \vspace{0.35em}\thb@accentbar@small
   \end{beamercolorbox}%
   \vspace{0.4em}}
 
@@ -371,7 +391,7 @@
 \newcommand{\thbnumber}[2]{%
   \begin{center}
     {\color{thbprimary}\fontsize{56}{56}\selectfont\bfseries #1}\par
-    \vspace{0.5em}{\color{thbaccent}\rule{2.2em}{2pt}}\par
+    \vspace{0.5em}\thb@accentbar@small\par
     \vspace{0.7em}{\large #2\par}
   \end{center}}
 
@@ -383,24 +403,24 @@
     {\large\itshape #1\par}\vspace{0.5em}{\small\color{thbmuted}#2\par}
   \end{mdframed}}
 
-% Full-bleed figure slide with caption strip
+% Full-bleed figure slide with caption strip (numbered, unlike the other package slides)
 \newcommand{\thbfullfigure}[2]{%
-  {\setbeamertemplate{headline}{}\setbeamertemplate{footline}{}%
-   \usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{#1}}%
-   \begin{frame}[plain]
+  {\usebackgroundtemplate{\includegraphics[width=\paperwidth,height=\paperheight]{#1}}%
+   \frame[plain]{\relax
      \vfill
      \hspace*{-\thbmargin}%
      \colorbox{thbink}{\parbox{\dimexpr\paperwidth-2\fboxsep}{%
-       \hspace{\thbmargin}\color{white}\small #2}}%
-   \end{frame}}}
+       \hspace{\thbmargin}\color{white}\small #2}}}}}
 
-% Two balanced columns:  \begin{twocols} ... \colbreak ... \end{twocols}
-\newcommand{\thb@colw}{0.48}
+% Two balanced columns:  \begin{twocols}[<width>] ... \colbreak ... \end{twocols}
+% \colbreak exists only inside twocols; elsewhere it explains itself.
+\newcommand{\colbreak}{%
+  \PackageError{thbtalk}{\string\colbreak\space outside twocols}%
+    {\string\colbreak\space separates the columns of \string\begin{twocols}...\string\end{twocols}.}}
 \newenvironment{twocols}[1][0.48]{%
-  \renewcommand{\thb@colw}{#1}%
-  \begin{columns}[T,onlytextwidth]\begin{column}{\thb@colw\textwidth}}%
+  \def\colbreak{\end{column}\hfill\begin{column}{#1\textwidth}}%
+  \begin{columns}[T,onlytextwidth]\begin{column}{#1\textwidth}}%
   {\end{column}\end{columns}}
-\newcommand{\colbreak}{\end{column}\hfill\begin{column}{\thb@colw\textwidth}}
 
 % Figure with caption, centred
 \newcommand{\thbfigure}[3][0.72]{%
@@ -422,6 +442,10 @@
 
 % Table helper: booktabs rules with the house colour
 \newcommand{\thbhead}[1]{{\color{thbprimary}\bfseries #1}}
+
+% A command name in typewriter type, e.g. \thbcmd{thbbackup}. Unlike \verb it works in
+% every frame, fragile or not. (\char`\\ is the backslash in both OT1 and T1 typewriter fonts.)
+\newcommand{\thbcmd}[1]{\texttt{\char`\\#1}}
 
 % Code listings
 \lstdefinestyle{thbcode}{
@@ -456,15 +480,10 @@
 % References frame (works with plain \bibitem or biblatex \printbibliography)
 \setbeamertemplate{bibliography item}{\color{thbaccent}\rule[0.25ex]{0.8ex}{0.8ex}}
 
-% Backup slides: stop counting towards the total
+% Backup slides: a divider slide, then everything after it is backup material.
+% \appendix starts a new beamer part; the backup slides are compiled and keep counting.
 \newcommand{\thbbackup}{%
   \appendix
-  \thb@sectionframe@backup}
-\newcommand{\thb@sectionframe@backup}{%
-  {\setbeamercolor{background canvas}{bg=thbprimary}%
-   \setbeamertemplate{headline}{}\setbeamertemplate{footline}{}%
-   \begin{frame}[plain,noframenumbering]
-     \vfill{\color{white}\usebeamerfont{title}\thbname@backup\par}\vfill
-   \end{frame}}}
+  \thb@darkslide{\vfill{\color{white}\usebeamerfont{title}\thbname@backup\par}\vfill}}
 
 \endinput

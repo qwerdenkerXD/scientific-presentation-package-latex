@@ -36,7 +36,18 @@ pdfLaTeX, 16:9, one `.sty` file. Drop `thbtalk.sty` next to your `.tex` file (or
 | `nosectionslides` | do not auto-insert a divider slide at each `\section` |
 | `notes=none\|second\|only` | speaker notes: off, second screen, or notes-only PDF |
 
-Switch language mid-document with `\thbsetlang{de}`.
+A misspelt value (`font=helvtica`) stops with an error instead of silently using the default.
+
+Switch language mid-document with `\thbsetlang{de}`. Add a language in the preamble; labels
+you leave out keep their English text:
+
+```latex
+\thbdeclarelang{fr}{outline=Plan, questions=Questions~?, recap=À retenir}
+\thbsetlang{fr}
+```
+
+The labels are `outline`, `takeaway`, `refs`, `backup`, `thanks`, `questions`, `figure`,
+`recap` and `where`.
 
 ## Structure commands
 
@@ -53,7 +64,7 @@ Switch language mid-document with `\thbsetlang{de}`.
 - `closing` environment — closing slide with the recap kept on screen for Q&A:
   `\begin{closing}[Questions?] \item … \end{closing}`; set the contact line once with
   `\thbcontact{mail · DOI}`
-- `\thbbackup` — divider for backup slides; everything after it is excluded from the slide count
+- `\thbbackup` — divider slide before the backup slides; they are compiled and numbered as usual
 
 ## Content helpers
 
@@ -63,7 +74,7 @@ Switch language mid-document with `\thbsetlang{de}`.
 
 \begin{twocols}           % optional width arg: \begin{twocols}[0.55]
   left column
-  \colbreak
+  \colbreak               % only valid inside twocols
   right column
 \end{twocols}
 
@@ -81,6 +92,7 @@ Switch language mid-document with `\thbsetlang{de}`.
 \thbnumber{39\,\%}{lower error at the same energy budget}      % one headline result
 \thbquote{Statement.}{Author, Year}                            % cited statement
 \thbfullfigure{photo.jpg}{Caption strip along the bottom.}     % full-bleed image slide
+\thbcmd{thbbackup}          % typesets \thbbackup; unlike \verb, no [fragile] needed
 ```
 
 Equations, theorems and code are deliberately styled differently so the audience can tell
@@ -118,6 +130,20 @@ the exact ones from the corporate design sheet if they differ. Supporting neutra
 
 ## Required packages
 
-`beamer`, `kvoptions`, `xcolor`, `graphicx`, `booktabs`, `listings`, `amsmath`,
-`tikz`, `pgfplots`, `algpseudocode` — all in a standard TeX Live / MiKTeX / Overleaf
-installation.
+LaTeX 2020-10 or newer, `beamer`, `kvoptions`, `ifthen`, `xcolor`, `graphicx`, `booktabs`,
+`array`, `listings`, `amsmath`, `amssymb`, `tikz`, `pgfplots`, `algpseudocode`, `mdframed`
+— all in a standard TeX Live / MiKTeX / Overleaf installation.
+
+## Changing the package
+
+`test/coverage.tex` uses every command and option. After editing `thbtalk.sty`, run
+
+```sh
+python3 test/check.py            # compare against thbtalk.sty in HEAD (or: a revision, a file)
+```
+
+It compiles the coverage document in four variants with both versions, renders every page and
+compares them pixel by pixel. Exit code 0 means nothing looks different; otherwise the differing
+pages are listed and marked red in `test/build/<variant>/diff-page-NN.png`. Needs `pdflatex`,
+`pdftocairo` (poppler-utils) and Python with Pillow. When you add a command, add it to
+`test/coverage.tex` as well.
